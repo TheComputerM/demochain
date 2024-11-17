@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@ark-ui/solid": "^4.5.0",
+    "@fontsource-variable/outfit": "^5.1.0",
     "@solidjs/meta": "^0.29.4",
     "@solidjs/router": "^0.15.0",
     "@solidjs/start": "^1.0.10",

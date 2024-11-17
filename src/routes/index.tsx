@@ -1,9 +1,12 @@
 import { Center } from "styled-system/jsx";
+import { Button } from "~/components/ui/button";
 
 export default function Home() {
 	return (
-		<Center>
-			<h1>Welcome to Demochain</h1>
+		<Center height="screen">
+			<Button size="2xl">
+				Enter the App
+			</Button>
 		</Center>
 	);
 }

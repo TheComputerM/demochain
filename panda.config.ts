@@ -12,6 +12,12 @@ export default defineConfig({
 	// Files to exclude
 	exclude: [],
 
+	globalVars: {
+		extend: {
+			'--global-font-body': "'Outfit Variable', sans-serif"
+		}
+	},
+
 	// Useful for theme customization
 	theme: {
 		extend: {},
