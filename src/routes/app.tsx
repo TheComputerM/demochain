@@ -1,5 +1,10 @@
 import { A, type RouteSectionProps } from "@solidjs/router";
-import { TbLogout, TbTerminal2, TbWallet } from "solid-icons/tb";
+import {
+	TbLogout,
+	TbTerminal2,
+	TbTopologyFull,
+	TbWallet,
+} from "solid-icons/tb";
 import { For } from "solid-js";
 import { Portal } from "solid-js/web";
 import { css } from "styled-system/css";
@@ -10,6 +15,7 @@ import { Tooltip } from "~/components/ui/tooltip";
 export default function AppLayout(props: RouteSectionProps) {
 	const routes = [
 		{ icon: TbWallet, id: "user", label: "Wallet" },
+		{ icon: TbTopologyFull, id: "network", label: "Network" },
 		{ icon: TbTerminal2, id: "console", label: "Console" },
 	];
 	return (
@@ -68,7 +74,9 @@ export default function AppLayout(props: RouteSectionProps) {
 					</IconButton>
 				</Stack>
 			</aside>
-			<Container width="full">{props.children}</Container>
+			<Container mt="3" width="full">
+				{props.children}
+			</Container>
 		</Flex>
 	);
 }
