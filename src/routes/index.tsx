@@ -4,7 +4,10 @@ import { Button } from "~/components/ui/button";
 export default function Home() {
 	return (
 		<Center height="screen">
-			<Button size="2xl">
+			<Button
+				size="2xl"
+				asChild={(forwardProps) => <a {...forwardProps()} href="/app/user" />}
+			>
 				Enter the App
 			</Button>
 		</Center>
