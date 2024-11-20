@@ -1,4 +1,4 @@
-import { type ParentComponent, createContext, onCleanup } from "solid-js";
+import { type ParentComponent, createContext, onCleanup, useContext } from "solid-js";
 import type { Room } from "trystero";
 import { joinRoom, selfId } from "trystero/mqtt";
 import { logger } from "./logger";
@@ -35,3 +35,12 @@ export const RoomProvider: ParentComponent = (props) => {
 		<RoomContext.Provider value={room}>{props.children}</RoomContext.Provider>
 	);
 };
+
+export const useRoom = () => {
+	const room = useContext(RoomContext);
+	if (!room) {
+		throw new Error("Node isn't connected to any network");
+	}
+
+	return room;
+}
