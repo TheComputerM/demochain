@@ -13,7 +13,7 @@ export default function ConsolePage() {
 			<Heading as="h1" textStyle="4xl">
 				Console
 			</Heading>
-			<Table.Root>
+			<Table.Root size="sm">
 				<Table.Head>
 					<Table.Row>
 						<Table.Header>Level</Table.Header>

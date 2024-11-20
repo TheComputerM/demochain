@@ -11,6 +11,7 @@ import { css } from "styled-system/css";
 import { Container, Flex, Stack } from "styled-system/jsx";
 import { IconButton } from "~/components/ui/icon-button";
 import { Tooltip } from "~/components/ui/tooltip";
+import { RoomProvider } from "~/lib/room";
 
 export default function AppLayout(props: RouteSectionProps) {
 	const routes = [
@@ -69,13 +70,17 @@ export default function AppLayout(props: RouteSectionProps) {
 					</For>
 				</Stack>
 				<Stack>
-					<IconButton>
-						<TbLogout />
-					</IconButton>
+					<IconButton
+						asChild={(forwardProps) => (
+							<A {...forwardProps()} href="/">
+								<TbLogout />
+							</A>
+						)}
+					/>
 				</Stack>
 			</aside>
 			<Container mt="3" width="full">
-				{props.children}
+				<RoomProvider>{props.children}</RoomProvider>
 			</Container>
 		</Flex>
 	);

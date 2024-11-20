@@ -1,13 +1,7 @@
-import {
-	type ParentComponent,
-	createContext,
-	createSignal,
-	onCleanup,
-	onMount,
-} from "solid-js";
-import { Show } from "solid-js";
+import { type ParentComponent, createContext, onCleanup } from "solid-js";
 import type { Room } from "trystero";
-import { joinRoom } from "trystero/mqtt";
+import { joinRoom, selfId } from "trystero/mqtt";
+import { logger } from "./logger";
 
 export const RoomContext = createContext<Room>();
 
@@ -24,6 +18,16 @@ export const RoomProvider: ParentComponent = (props) => {
 		},
 		"main",
 	);
+
+	logger.info(`Joined network as ${selfId}`);
+
+	room.onPeerJoin((peer) => {
+		logger.info(`Peer ${peer} joined the network`);
+	});
+
+	room.onPeerLeave((peer) => {
+		logger.info(`Peer ${peer} is offline`);
+	});
 
 	onCleanup(room.leave);
 
