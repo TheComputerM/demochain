@@ -9,6 +9,7 @@ import { For } from "solid-js";
 import { Portal } from "solid-js/web";
 import { css } from "styled-system/css";
 import { Container, Flex, Stack } from "styled-system/jsx";
+import ThemeSwitcher from "~/components/theme-switcher";
 import { IconButton } from "~/components/ui/icon-button";
 import { Tooltip } from "~/components/ui/tooltip";
 import { RoomProvider } from "~/lib/room";
@@ -32,7 +33,7 @@ export default function AppLayout(props: RouteSectionProps) {
 					backgroundColor: "bg.default",
 					paddingBlock: 1,
 					paddingInline: 1,
-					borderColor: "border.default",
+					borderColor: "border.subtle",
 					borderRight: "1px solid",
 				})}
 			>
@@ -69,7 +70,8 @@ export default function AppLayout(props: RouteSectionProps) {
 						)}
 					</For>
 				</Stack>
-				<Stack>
+				<Stack gap="1">
+					<ThemeSwitcher />
 					<IconButton
 						asChild={(forwardProps) => (
 							<A {...forwardProps()} href="/">
