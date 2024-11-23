@@ -12,9 +12,10 @@ import {
 	chainSettingsStore,
 	createGenesisBlock,
 } from "./blockchain/chain";
-import { logger } from "./logger";
+import { addTransaction, mempoolStore } from "./blockchain/mempool";
 import { deserialize, serialize } from "./blockchain/serializer";
-import { mempoolStore } from "./blockchain/mempool";
+import type { Transaction } from "./blockchain/transaction";
+import { logger } from "./logger";
 
 export const RoomContext = createContext<Room>();
 
@@ -44,8 +45,7 @@ export const RoomProvider: ParentComponent = (props) => {
 		}, 4000);
 	});
 
-	const [sendInitialization, getInitialization] =
-		room.makeAction("init_sync");
+	const [sendInitialization, getInitialization] = room.makeAction("init_sync");
 
 	room.onPeerJoin((peer) => {
 		logger.info(`Peer ${peer} joined the network`);
@@ -69,13 +69,22 @@ export const RoomProvider: ParentComponent = (props) => {
 			chainSettingsStore.setState(() => settings);
 			mempoolStore.setState(() => mempool);
 		}
-	})
+	});
 
 	room.onPeerLeave((peer) => {
 		logger.info(`Peer ${peer} is offline`);
 	});
 
 	onCleanup(async () => await room.leave());
+
+	const [, getTransaction] = room.makeAction("send_tsx");
+	getTransaction((data) => {
+		const transaction = deserialize(data as Uint8Array) as Transaction;
+		logger.info(
+			`new transaction from ${transaction.sender} to ${transaction.recipient} of ${transaction.amount}`,
+		);
+		addTransaction(transaction);
+	});
 
 	return (
 		<RoomContext.Provider value={room}>{props.children}</RoomContext.Provider>

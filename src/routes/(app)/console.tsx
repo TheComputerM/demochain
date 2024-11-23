@@ -9,7 +9,7 @@ export default function ConsolePage() {
 	const logs = useStore(logStore);
 
 	return (
-		<Stack>
+		<Stack gap="6">
 			<Heading as="h1" textStyle="4xl">
 				Console
 			</Heading>

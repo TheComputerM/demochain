@@ -1,6 +1,6 @@
 import { IconArrowNarrowRight, IconPlus } from "@tabler/icons-solidjs";
 import { useStore } from "@tanstack/solid-store";
-import { For, type Component } from "solid-js";
+import { type Component, For } from "solid-js";
 import { HStack, Stack } from "styled-system/jsx";
 import { Button } from "~/components/ui/button";
 import { Card } from "~/components/ui/card";
