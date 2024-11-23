@@ -1,6 +1,7 @@
 import { TbAccessPoint } from "solid-icons/tb";
 import { createSignal } from "solid-js";
-import { HStack, Stack } from "styled-system/jsx";
+import { Divider, HStack, Stack } from "styled-system/jsx";
+import { BlockchainDisplay } from "~/components/network/blockchain";
 import { Badge } from "~/components/ui/badge";
 import { Heading } from "~/components/ui/heading";
 import { useRoom } from "~/lib/room";
@@ -28,6 +29,14 @@ export default function NetworkPage() {
 				</Heading>
 				<ConnectedPeers />
 			</HStack>
+			<Heading as="h2" textStyle="2xl">
+				Chain
+			</Heading>
+			<BlockchainDisplay />
+			<Divider my="3" />
+			<Heading as="h2" textStyle="2xl">
+				Mempool
+			</Heading>
 		</Stack>
 	);
 }
