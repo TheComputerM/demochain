@@ -23,15 +23,15 @@ export default function AppLayout(props: RouteSectionProps) {
 		{ icon: IconTerminal2, id: "console", label: "Console" },
 	];
 	return (
-		<Flex height="screen">
+		<Flex>
 			<aside
 				class={css({
 					display: "flex",
 					flexDirection: "column",
 					justifyContent: "space-between",
-					top: 0,
 					position: "sticky",
-					bottom: 0,
+					top: 0,
+					height: "100svh",
 					backgroundColor: "bg.default",
 					paddingBlock: 1,
 					paddingInline: 1,
