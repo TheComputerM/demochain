@@ -5,7 +5,7 @@ import { HStack, Stack } from "styled-system/jsx";
 import { Button } from "~/components/ui/button";
 import { Card } from "~/components/ui/card";
 import { Heading } from "~/components/ui/heading";
-import { mempool } from "~/lib/blockchain/mempool";
+import { mempoolStore } from "~/lib/blockchain/mempool";
 import type { Transaction } from "~/lib/blockchain/transaction";
 
 const TransactionDisplay: Component<{ transaction: Transaction }> = (props) => {
@@ -32,7 +32,7 @@ const TransactionDisplay: Component<{ transaction: Transaction }> = (props) => {
 };
 
 const MempoolDisplay: Component = () => {
-	const transactions = useStore(mempool);
+	const transactions = useStore(mempoolStore);
 	return (
 		<Stack>
 			<For each={transactions()}>

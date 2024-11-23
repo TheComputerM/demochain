@@ -2,7 +2,7 @@ import { useStore } from "@tanstack/solid-store";
 import { type Component, For } from "solid-js";
 import { Divider, Grid, Stack } from "styled-system/jsx";
 import type { Block } from "~/lib/blockchain/block";
-import { blockchain } from "~/lib/blockchain/chain";
+import { blockchainStore } from "~/lib/blockchain/chain";
 import { Card } from "../ui/card";
 import { Table } from "../ui/table";
 
@@ -58,7 +58,7 @@ export const BlockDisplay: Component<{ block: Block }> = (props) => {
 };
 
 export const BlockchainDisplay: Component = () => {
-	const chain = useStore(blockchain);
+	const chain = useStore(blockchainStore);
 	return (
 		<Stack>
 			<For each={chain()}>{(block) => <BlockDisplay block={block} />}</For>
