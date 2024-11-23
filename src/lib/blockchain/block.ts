@@ -1,9 +1,12 @@
+import type { Transaction } from "./transaction";
+
 export class Block {
 	index: number;
 	timestamp: number;
 	hash: string;
 	previousHash: string;
 	nonce: number;
+  transactions: Transaction[];
 
 	constructor(
 		index: number,
@@ -11,12 +14,14 @@ export class Block {
 		hash: string,
 		previousHash: string,
 		nonce: number,
+    transactions: Transaction[]
 	) {
 		this.index = index;
 		this.timestamp = timestamp;
 		this.hash = hash;
 		this.previousHash = previousHash;
 		this.nonce = nonce;
+    this.transactions = transactions;
 	}
 
 	async calculateHash() {

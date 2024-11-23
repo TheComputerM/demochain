@@ -17,6 +17,7 @@
     "@solidjs/router": "^0.15.0",
     "@solidjs/start": "^1.0.10",
     "@tanstack/solid-store": "^0.5.7",
+    "cbor2": "^1.7.1",
     "solid-icons": "^1.1.0",
     "solid-js": "^1.9.2",
     "trystero": "^0.20.0",
