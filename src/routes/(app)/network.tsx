@@ -1,7 +1,7 @@
 import { IconAccessPoint } from "@tabler/icons-solidjs";
 import { createSignal } from "solid-js";
-import { Divider, HStack, Stack } from "styled-system/jsx";
-import { BlockchainDisplay } from "~/components/network/blockchain";
+import { HStack, Stack } from "styled-system/jsx";
+import { BlockchainDisplay } from "~/components/chain/blockchain";
 import { Badge } from "~/components/ui/badge";
 import { Heading } from "~/components/ui/heading";
 import { useRoom } from "~/lib/room";
@@ -25,18 +25,11 @@ export default function NetworkPage() {
 		<Stack>
 			<HStack justify="space-between">
 				<Heading as="h1" textStyle="4xl">
-					Network
+					Chain
 				</Heading>
 				<ConnectedPeers />
 			</HStack>
-			<Heading as="h2" textStyle="2xl">
-				Chain
-			</Heading>
 			<BlockchainDisplay />
-			<Divider my="3" />
-			<Heading as="h2" textStyle="2xl">
-				Mempool
-			</Heading>
 		</Stack>
 	);
 }

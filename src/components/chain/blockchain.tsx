@@ -1,6 +1,6 @@
 import { useStore } from "@tanstack/solid-store";
 import { type Component, For } from "solid-js";
-import { Divider, Grid } from "styled-system/jsx";
+import { Divider, Grid, Stack } from "styled-system/jsx";
 import type { Block } from "~/lib/blockchain/block";
 import { blockchain } from "~/lib/blockchain/chain";
 import { Card } from "../ui/card";
@@ -9,11 +9,11 @@ import { Table } from "../ui/table";
 export const BlockDisplay: Component<{ block: Block }> = (props) => {
 	return (
 		<Card.Root wordWrap="break-word">
-			<Card.Header padding="3">
+			<Card.Header>
 				<Card.Title>Block #{props.block.index}</Card.Title>
 				<Card.Description>{props.block.hash}</Card.Description>
 			</Card.Header>
-			<Card.Body padding="0">
+			<Card.Body>
 				<Table.Root size="sm">
 					<Table.Head>
 						<Table.Header colSpan={2}>Properties</Table.Header>
@@ -60,8 +60,8 @@ export const BlockDisplay: Component<{ block: Block }> = (props) => {
 export const BlockchainDisplay: Component = () => {
 	const chain = useStore(blockchain);
 	return (
-		<Grid columns={3}>
+		<Stack>
 			<For each={chain()}>{(block) => <BlockDisplay block={block} />}</For>
-		</Grid>
+		</Stack>
 	);
 };
