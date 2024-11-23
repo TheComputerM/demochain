@@ -6,7 +6,7 @@ export default function Home() {
 		<Center height="screen">
 			<Button
 				size="2xl"
-				asChild={(forwardProps) => <a {...forwardProps()} href="/app/user" />}
+				asChild={(forwardProps) => <a {...forwardProps()} href="/user" />}
 			>
 				Enter the App
 			</Button>

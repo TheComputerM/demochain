@@ -54,7 +54,7 @@ export default function AppLayout(props: RouteSectionProps) {
 													: "ghost"
 											}
 											asChild={(forwardProps) => (
-												<A {...forwardProps()} href={`/app/${route.id}`}>
+												<A {...forwardProps()} href={`/${route.id}`}>
 													<route.icon />
 												</A>
 											)}
