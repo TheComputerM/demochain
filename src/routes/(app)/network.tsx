@@ -1,4 +1,4 @@
-import { TbAccessPoint } from "solid-icons/tb";
+import { IconAccessPoint } from "@tabler/icons-solidjs";
 import { createSignal } from "solid-js";
 import { Divider, HStack, Stack } from "styled-system/jsx";
 import { BlockchainDisplay } from "~/components/network/blockchain";
@@ -15,7 +15,7 @@ const ConnectedPeers = () => {
 
 	return (
 		<Badge variant="solid">
-			{peers()} Connected <TbAccessPoint />
+			{peers()} Connected <IconAccessPoint />
 		</Badge>
 	);
 };

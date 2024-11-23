@@ -3,7 +3,6 @@ import { encode, registerEncoder } from "cbor2/encoder";
 import { Block } from "./block";
 import { Transaction } from "./transaction";
 
-
 // Serialization for Transaction class
 registerEncoder(Transaction, (b, _writer, _options) => [
 	64000,

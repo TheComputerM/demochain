@@ -1,10 +1,11 @@
 import { A, type RouteSectionProps } from "@solidjs/router";
 import {
-	TbLogout,
-	TbTerminal2,
-	TbTopologyFull,
-	TbWallet,
-} from "solid-icons/tb";
+	IconLogout,
+	IconPick,
+	IconTerminal2,
+	IconTopologyFull,
+	IconWallet,
+} from "@tabler/icons-solidjs";
 import { For } from "solid-js";
 import { Portal } from "solid-js/web";
 import { css } from "styled-system/css";
@@ -16,9 +17,10 @@ import { RoomProvider } from "~/lib/room";
 
 export default function AppLayout(props: RouteSectionProps) {
 	const routes = [
-		{ icon: TbWallet, id: "user", label: "Wallet" },
-		{ icon: TbTopologyFull, id: "network", label: "Network" },
-		{ icon: TbTerminal2, id: "console", label: "Console" },
+		{ icon: IconWallet, id: "user", label: "Wallet" },
+		{ icon: IconTopologyFull, id: "network", label: "Network" },
+		{ icon: IconPick, id: "mempool", label: "Mempool" },
+		{ icon: IconTerminal2, id: "console", label: "Console" },
 	];
 	return (
 		<Flex height="screen">
@@ -75,7 +77,7 @@ export default function AppLayout(props: RouteSectionProps) {
 					<IconButton
 						asChild={(forwardProps) => (
 							<A {...forwardProps()} href="/">
-								<TbLogout />
+								<IconLogout />
 							</A>
 						)}
 					/>

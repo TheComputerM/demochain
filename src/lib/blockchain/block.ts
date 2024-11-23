@@ -6,7 +6,7 @@ export class Block {
 	hash: string;
 	previousHash: string;
 	nonce: number;
-  transactions: Transaction[];
+	transactions: Transaction[];
 
 	constructor(
 		index: number,
@@ -14,14 +14,14 @@ export class Block {
 		hash: string,
 		previousHash: string,
 		nonce: number,
-    transactions: Transaction[]
+		transactions: Transaction[],
 	) {
 		this.index = index;
 		this.timestamp = timestamp;
 		this.hash = hash;
 		this.previousHash = previousHash;
 		this.nonce = nonce;
-    this.transactions = transactions;
+		this.transactions = transactions;
 	}
 
 	async calculateHash() {

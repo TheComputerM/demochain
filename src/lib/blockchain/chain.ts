@@ -1,8 +1,8 @@
 import { Store } from "@tanstack/solid-store";
+import { selfId } from "trystero";
 import { Block } from "./block";
 import { deserialize, serialize } from "./serializer";
 import { Transaction } from "./transaction";
-import { selfId } from "trystero";
 
 export const blockchain = new Store<Block[]>([]);
 export const chainSettings = new Store<{
@@ -31,7 +31,7 @@ export async function createGenesisBlock() {
 	const block = new Block(0, Date.now(), "", "", 0, [
 		new Transaction("Creator", selfId, 1000),
 	]);
-	
+
 	console.log(serialize(block));
 	await block.mine(chainSettings.state.difficulty);
 	console.log(deserialize(serialize(block)));
