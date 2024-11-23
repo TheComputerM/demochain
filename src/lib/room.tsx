@@ -1,4 +1,9 @@
-import { type ParentComponent, createContext, onCleanup, useContext } from "solid-js";
+import {
+	type ParentComponent,
+	createContext,
+	onCleanup,
+	useContext,
+} from "solid-js";
 import type { Room } from "trystero";
 import { joinRoom, selfId } from "trystero/mqtt";
 import { logger } from "./logger";
@@ -43,4 +48,4 @@ export const useRoom = () => {
 	}
 
 	return room;
-}
+};

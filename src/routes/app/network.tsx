@@ -13,9 +13,11 @@ const ConnectedPeers = () => {
 	room.onPeerLeave(() => setPeers((prev) => prev - 1));
 
 	return (
-		<Badge variant="solid">{peers()} Connected <TbAccessPoint /></Badge>
+		<Badge variant="solid">
+			{peers()} Connected <TbAccessPoint />
+		</Badge>
 	);
-}
+};
 
 export default function NetworkPage() {
 	return (
