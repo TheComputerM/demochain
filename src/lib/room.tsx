@@ -22,7 +22,7 @@ export const RoomContext = createContext<Room>();
 export const RoomProvider: ParentComponent = (props) => {
 	const room = joinRoom(
 		{
-			appId: "demochain_project",
+			appId: "demochain_rulezz",
 			relayUrls: [
 				"wss://broker.emqx.io:8084/mqtt",
 				"wss://mqtt.eclipseprojects.io:433/mqtt",

@@ -1,6 +1,6 @@
 import { useStore } from "@tanstack/solid-store";
 import { type Component, For } from "solid-js";
-import { Divider, Grid, Stack } from "styled-system/jsx";
+import { Divider, Stack } from "styled-system/jsx";
 import type { Block } from "~/lib/blockchain/block";
 import { blockchainStore } from "~/lib/blockchain/chain";
 import { Card } from "../ui/card";

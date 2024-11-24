@@ -4,7 +4,7 @@ import {
 	IconPlus,
 } from "@tabler/icons-solidjs";
 import { Store, useStore } from "@tanstack/solid-store";
-import { type Component, createEffect, For, Show } from "solid-js";
+import { type Component, For, Show, createEffect } from "solid-js";
 import { HStack, Stack } from "styled-system/jsx";
 import { Button } from "~/components/ui/button";
 import { Card } from "~/components/ui/card";
@@ -89,12 +89,13 @@ const MineTransactions: Component = () => {
 	/**
 	 * Create a block from the selected transactions
 	 */
-	async function createBlock() {
-		
-	}
+	async function createBlock() {}
 
 	return (
-		<Button disabled={!selectedTransactions().find((x) => x)} onClick={createBlock}>
+		<Button
+			disabled={!selectedTransactions().find((x) => x)}
+			onClick={createBlock}
+		>
 			Mine Selected Transactions
 		</Button>
 	);
