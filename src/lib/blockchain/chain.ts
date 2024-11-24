@@ -1,6 +1,11 @@
-import { type SetStoreFunction, createStore } from "solid-js/store";
+import {
+	type SetStoreFunction,
+	createStore,
+	reconcile,
+} from "solid-js/store";
 import { Block } from "./block";
 import { Transaction } from "./transaction";
+import { batch } from "solid-js";
 
 export interface BlockchainSettings {
 	difficulty: number;
@@ -33,7 +38,7 @@ export class Blockchain {
 		]);
 
 		await block.mine(this.store.settings.difficulty);
-		
+
 		this.setStore("blocks", 0, block);
 	}
 
@@ -53,7 +58,17 @@ export class Blockchain {
 			throw new Error("Invalid block hash");
 		}
 
-		this.setStore("blocks", this.store.blocks.length, block);
+		batch(() => {
+			this.setStore("blocks", this.store.blocks.length, block);
+			this.setStore(
+				"mempool",
+				reconcile(
+					this.store.mempool.filter(
+						(transaction) => !block.transactions.includes(transaction),
+					),
+				),
+			);
+		});
 	}
 
 	/**
