@@ -28,11 +28,13 @@ export const BlockchainProvider: ParentComponent = (props) => {
 
 	const [syncState, getNetworkState] = room.makeAction("init_sync");
 
-	getNetworkState((data) => {
+	getNetworkState(async (data) => {
 		if (blockchain.store.blocks.length === 0) {
 			const blockchainState = decode<BlockchainState>(data as Uint8Array);
-			blockchain.setStore(blockchainState);
-			logger.info("State synced with the network");
+			if (await Blockchain.validate(blockchainState.blocks)) {
+				blockchain.setStore(blockchainState);
+				logger.info("State synced with the network");
+			}
 		}
 	});
 

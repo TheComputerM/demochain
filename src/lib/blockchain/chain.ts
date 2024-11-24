@@ -2,6 +2,7 @@ import { batch } from "solid-js";
 import { type SetStoreFunction, createStore, reconcile } from "solid-js/store";
 import { Block } from "./block";
 import { Transaction } from "./transaction";
+import { logger } from "../logger";
 
 export interface BlockchainSettings {
 	difficulty: number;
@@ -83,15 +84,18 @@ export class Blockchain {
 	/**
 	 * Validate the entire blockchain.
 	 */
-	async validate() {
-		for (let i = 1; i < this.store.blocks.length; i++) {
-			const block = this.store.blocks[i];
-			const previousBlock = this.store.blocks[i - 1];
+	static async validate(blocks: Block[]) {
+		const startTime = new Date().getTime();
+		for (let i = 1; i < blocks.length; i++) {
+			const block = blocks[i];
+			const previousBlock = blocks[i - 1];
 
 			if (block.previousHash !== previousBlock.hash) return false;
 
 			if (block.hash !== (await block.calculateHash())) return false;
 		}
+		const endTime = new Date().getTime();
+		logger.info(`Validated blockchain in ${endTime - startTime}ms`);
 		return true;
 	}
 }
