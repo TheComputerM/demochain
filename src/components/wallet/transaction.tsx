@@ -1,11 +1,11 @@
+import { encode } from "cbor2";
 import { HStack } from "styled-system/jsx";
 import { selfId } from "trystero";
+import { useBlockchain } from "~/lib/blockchain-context";
 import { Transaction } from "~/lib/blockchain/transaction";
+import { useRoom } from "~/lib/room";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
-import { useRoom } from "~/lib/room";
-import { useBlockchain } from "~/lib/blockchain-context";
-import { encode } from "cbor2";
 
 export const TransactionForm = () => {
 	const room = useRoom();

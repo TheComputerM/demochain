@@ -87,9 +87,7 @@ export default function AppLayout(props: RouteSectionProps) {
 			</aside>
 			<Container mt="3" width="full">
 				<RoomProvider>
-					<BlockchainProvider>
-						{props.children}
-					</BlockchainProvider>
+					<BlockchainProvider>{props.children}</BlockchainProvider>
 				</RoomProvider>
 			</Container>
 		</Flex>

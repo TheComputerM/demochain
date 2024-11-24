@@ -1,4 +1,5 @@
 import { makeEventListener } from "@solid-primitives/event-listener";
+import { decode, encode } from "cbor2";
 import {
 	type ParentComponent,
 	createContext,
@@ -6,13 +7,12 @@ import {
 	useContext,
 } from "solid-js";
 import { unwrap } from "solid-js/store";
+import { selfId } from "trystero";
 import { Blockchain, type BlockchainState } from "~/lib/blockchain/chain";
+import type { Transaction } from "~/lib/blockchain/transaction";
 import { logger } from "~/lib/logger";
 import { useRoom } from "~/lib/room";
-import { selfId } from "trystero";
-import type { Transaction } from "~/lib/blockchain/transaction";
 import type { Block } from "./blockchain/block";
-import { decode, encode } from "cbor2";
 
 const BlockchainContext = createContext<Blockchain>();
 
