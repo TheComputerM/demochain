@@ -1,6 +1,10 @@
-import { IconArrowNarrowRight, IconPlus } from "@tabler/icons-solidjs";
-import { useStore } from "@tanstack/solid-store";
-import { type Component, For } from "solid-js";
+import {
+	IconArrowNarrowRight,
+	IconMinus,
+	IconPlus,
+} from "@tabler/icons-solidjs";
+import { Store, useStore } from "@tanstack/solid-store";
+import { type Component, createEffect, For, Show } from "solid-js";
 import { HStack, Stack } from "styled-system/jsx";
 import { Button } from "~/components/ui/button";
 import { Card } from "~/components/ui/card";
@@ -8,7 +12,22 @@ import { Heading } from "~/components/ui/heading";
 import { mempoolStore } from "~/lib/blockchain/mempool";
 import type { Transaction } from "~/lib/blockchain/transaction";
 
-const TransactionDisplay: Component<{ transaction: Transaction }> = (props) => {
+const selectedTransactionsStore = new Store<boolean[]>([]);
+
+const TransactionDisplay: Component<{
+	transaction: Transaction;
+	index: number;
+}> = (props) => {
+	// TODO: select transaction based on index only
+	const selectedTransactions = useStore(selectedTransactionsStore);
+	const isSelected = () => selectedTransactions()[props.index];
+	const toggleSelected = () => {
+		selectedTransactionsStore.setState((state) => {
+			state[props.index] = !state[props.index];
+			return state;
+		});
+	};
+
 	return (
 		<Card.Root>
 			<Card.Header>
@@ -21,9 +40,22 @@ const TransactionDisplay: Component<{ transaction: Transaction }> = (props) => {
 						</Card.Title>
 						<Card.Description>{props.transaction.amount}</Card.Description>
 					</Stack>
-					<Button>
-						<IconPlus />
-						Add to Block
+					<Button
+						variant={isSelected() ? "outline" : "solid"}
+						onClick={toggleSelected}
+					>
+						<Show
+							when={isSelected()}
+							fallback={
+								<>
+									<IconPlus />
+									Add to Block
+								</>
+							}
+						>
+							<IconMinus />
+							Remove
+						</Show>
 					</Button>
 				</HStack>
 			</Card.Header>
@@ -32,18 +64,40 @@ const TransactionDisplay: Component<{ transaction: Transaction }> = (props) => {
 };
 
 const MempoolDisplay: Component = () => {
-	const transactions = useStore(mempoolStore);
+	const mempool = useStore(mempoolStore);
+
+	createEffect(() => {
+		selectedTransactionsStore.setState(() =>
+			new Array(mempool().length).fill(false),
+		);
+	});
+
 	return (
 		<Stack>
-			<For each={transactions()}>
-				{(transaction) => <TransactionDisplay transaction={transaction} />}
+			<For each={mempool()}>
+				{(transaction, i) => (
+					<TransactionDisplay transaction={transaction} index={i()} />
+				)}
 			</For>
 		</Stack>
 	);
 };
 
 const MineTransactions: Component = () => {
-	return <Button>Mine Selected Transactions</Button>;
+	const selectedTransactions = useStore(selectedTransactionsStore);
+
+	/**
+	 * Create a block from the selected transactions
+	 */
+	async function createBlock() {
+		
+	}
+
+	return (
+		<Button disabled={!selectedTransactions().find((x) => x)} onClick={createBlock}>
+			Mine Selected Transactions
+		</Button>
+	);
 };
 
 export default function MempoolPage() {
