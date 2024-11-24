@@ -64,6 +64,7 @@ export const BlockchainProvider: ParentComponent = (props) => {
 	const getBlock = room.makeAction("sngl_blk")[1];
 	getBlock((data) => {
 		const block = decode<Block>(data as Uint8Array);
+		logger.info(`Received block ${block.hash} at ${(new Date()).getTime()}`);
 		blockchain.appendBlock(block);
 	});
 

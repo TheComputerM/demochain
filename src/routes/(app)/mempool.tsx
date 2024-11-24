@@ -13,6 +13,7 @@ import { Heading } from "~/components/ui/heading";
 import { useBlockchain } from "~/lib/blockchain-context";
 import { Block } from "~/lib/blockchain/block";
 import type { Transaction } from "~/lib/blockchain/transaction";
+import { logger } from "~/lib/logger";
 import { useRoom } from "~/lib/room";
 
 const selectedTransactionsStore = new Store<boolean[]>([]);
@@ -107,7 +108,8 @@ const MineTransactions: Component = () => {
 		);
 		await block.mine(blockchain.store.settings.difficulty);
 		blockchain.appendBlock(block);
-		sendBlock(encode(block));
+		logger.info(`Broadcasted block ${block.hash} at ${(new Date()).getTime()}`);
+		await sendBlock(encode(block));
 	}
 
 	return (
