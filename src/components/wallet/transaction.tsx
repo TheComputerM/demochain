@@ -4,8 +4,8 @@ import { Transaction } from "~/lib/blockchain/transaction";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { useRoom } from "~/lib/room";
-import { encode } from "~/lib/blockchain/serializer";
 import { useBlockchain } from "~/lib/blockchain-context";
+import { encode } from "cbor2";
 
 export const TransactionForm = () => {
 	const room = useRoom();

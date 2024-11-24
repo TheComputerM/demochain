@@ -15,6 +15,7 @@ import { IconButton } from "~/components/ui/icon-button";
 import { Tooltip } from "~/components/ui/tooltip";
 import { BlockchainProvider } from "~/lib/blockchain-context";
 import { RoomProvider } from "~/lib/room";
+import "~/lib/utils/register-encoder";
 
 export default function AppLayout(props: RouteSectionProps) {
 	const routes = [

@@ -4,6 +4,7 @@ import {
 	IconPlus,
 } from "@tabler/icons-solidjs";
 import { Store, useStore } from "@tanstack/solid-store";
+import { encode } from "cbor2";
 import { type Component, For, Show, createEffect } from "solid-js";
 import { HStack, Stack } from "styled-system/jsx";
 import { Button } from "~/components/ui/button";
@@ -13,7 +14,6 @@ import { useBlockchain } from "~/lib/blockchain-context";
 import { Block } from "~/lib/blockchain/block";
 import type { Transaction } from "~/lib/blockchain/transaction";
 import { useRoom } from "~/lib/room";
-import { encode } from "~/lib/blockchain/serializer";
 
 const selectedTransactionsStore = new Store<boolean[]>([]);
 

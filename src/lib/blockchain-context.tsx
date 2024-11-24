@@ -7,12 +7,12 @@ import {
 } from "solid-js";
 import { unwrap } from "solid-js/store";
 import { Blockchain, type BlockchainState } from "~/lib/blockchain/chain";
-import { decode, encode } from "~/lib/blockchain/serializer";
 import { logger } from "~/lib/logger";
 import { useRoom } from "~/lib/room";
 import { selfId } from "trystero";
 import type { Transaction } from "~/lib/blockchain/transaction";
 import type { Block } from "./blockchain/block";
+import { decode, encode } from "cbor2";
 
 const BlockchainContext = createContext<Blockchain>();
 

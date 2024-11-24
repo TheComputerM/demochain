@@ -1,7 +1,7 @@
-import { Tag, decode } from "cbor2";
-import { encode, registerEncoder } from "cbor2/encoder";
-import { Block } from "./block";
-import { Transaction } from "./transaction";
+import { Tag } from "cbor2";
+import { registerEncoder } from "cbor2/encoder";
+import { Block } from "../blockchain/block";
+import { Transaction } from "../blockchain/transaction";
 
 // Serialization for Transaction class
 registerEncoder(Transaction, (b, _writer, _options) => [
@@ -24,5 +24,3 @@ Tag.registerDecoder(
 	({ contents }) =>
 		new Block(...(contents as ConstructorParameters<typeof Block>)),
 );
-
-export { encode, decode };
