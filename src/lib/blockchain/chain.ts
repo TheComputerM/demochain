@@ -1,8 +1,4 @@
-import {
-	type SetStoreFunction,
-	createStore,
-	reconcile,
-} from "solid-js/store";
+import { type SetStoreFunction, createStore, reconcile } from "solid-js/store";
 import { Block } from "./block";
 import { Transaction } from "./transaction";
 import { batch } from "solid-js";
@@ -34,7 +30,7 @@ export class Blockchain {
 		}
 
 		const block = new Block(0, Date.now(), "", "", 0, [
-			new Transaction("Creator", selfId, 1000),
+			new Transaction("Creator", selfId, 1000, Date.now()),
 		]);
 
 		await block.mine(this.store.settings.difficulty);
@@ -64,7 +60,10 @@ export class Blockchain {
 				"mempool",
 				reconcile(
 					this.store.mempool.filter(
-						(transaction) => !block.transactions.includes(transaction),
+						(transaction) =>
+							!block.transactions
+								.map((t) => t.timestamp)
+								.includes(transaction.timestamp),
 					),
 				),
 			);

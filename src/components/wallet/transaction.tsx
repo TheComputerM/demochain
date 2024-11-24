@@ -18,7 +18,7 @@ export const TransactionForm = () => {
 		const formdata = new FormData(e.target as HTMLFormElement);
 		const wallet = formdata.get("wallet") as string;
 		const amount = Number.parseInt(formdata.get("amount") as string);
-		const transaction = new Transaction(selfId, wallet, amount);
+		const transaction = new Transaction(selfId, wallet, amount, Date.now());
 		blockchain.addTransaction(transaction);
 		sendTransaction(encode(transaction));
 	};

@@ -6,7 +6,7 @@ import { Transaction } from "./transaction";
 // Serialization for Transaction class
 registerEncoder(Transaction, (b, _writer, _options) => [
 	64000,
-	[b.sender, b.recipient, b.amount],
+	[b.sender, b.recipient, b.amount, b.timestamp],
 ]);
 Tag.registerDecoder(
 	64000,
