@@ -53,6 +53,9 @@ export class Blockchain {
 		if (block.hash !== (await block.calculateHash())) {
 			throw new Error("Invalid block hash");
 		}
+		if (!block.hash.startsWith("0".repeat(this.store.settings.difficulty))) {
+			throw new Error("Block does not meet difficulty requirements");
+		}
 
 		batch(() => {
 			this.setStore("blocks", this.store.blocks.length, block);
@@ -75,5 +78,20 @@ export class Blockchain {
 	 */
 	addTransaction(transaction: Transaction) {
 		this.setStore("mempool", this.store.mempool.length, transaction);
+	}
+
+	/**
+	 * Validate the entire blockchain.
+	 */
+	async validate() {
+		for (let i = 1; i < this.store.blocks.length; i++) {
+			const block = this.store.blocks[i];
+			const previousBlock = this.store.blocks[i - 1];
+
+			if (block.previousHash !== previousBlock.hash) return false;
+
+			if (block.hash !== (await block.calculateHash())) return false;
+		}
+		return true;
 	}
 }
