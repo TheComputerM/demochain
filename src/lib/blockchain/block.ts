@@ -1,3 +1,4 @@
+import { blockchainStore } from "./chain";
 import type { Transaction } from "./transaction";
 
 export class Block {
@@ -25,7 +26,7 @@ export class Block {
 	}
 
 	async calculateHash() {
-		const data = `${this.index}${this.timestamp}${this.previousHash}${this.nonce}`;
+		const data = `${this.index}${this.timestamp}${this.previousHash}${this.nonce}${this.transactions}`;
 		const buffer = new TextEncoder().encode(data);
 		const hashBuffer = await crypto.subtle.digest("SHA-256", buffer);
 		const hashArray = Array.from(new Uint8Array(hashBuffer));
@@ -42,5 +43,13 @@ export class Block {
 			this.nonce++;
 			this.hash = await this.calculateHash();
 		}
+	}
+
+	static createBlock(transactions: Transaction[]) {
+		const previousBlock = blockchainStore.state.at(-1);
+		if (!previousBlock) {
+			throw new Error("No previous block found");
+		}
+		return new Block(blockchainStore.state.length, Date.now(), "", previousBlock.hash, 0, transactions);
 	}
 }

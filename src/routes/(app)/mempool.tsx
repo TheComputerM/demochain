@@ -9,8 +9,12 @@ import { HStack, Stack } from "styled-system/jsx";
 import { Button } from "~/components/ui/button";
 import { Card } from "~/components/ui/card";
 import { Heading } from "~/components/ui/heading";
+import { Block } from "~/lib/blockchain/block";
+import { blockchainStore, chainSettingsStore } from "~/lib/blockchain/chain";
 import { mempoolStore } from "~/lib/blockchain/mempool";
+import { serialize } from "~/lib/blockchain/serializer";
 import type { Transaction } from "~/lib/blockchain/transaction";
+import { useRoom } from "~/lib/room";
 
 const selectedTransactionsStore = new Store<boolean[]>([]);
 
@@ -85,11 +89,20 @@ const MempoolDisplay: Component = () => {
 
 const MineTransactions: Component = () => {
 	const selectedTransactions = useStore(selectedTransactionsStore);
+	const mempool = useStore(mempoolStore);
+	const room = useRoom();
+
+	const [sendBlock] = room.makeAction("send_block");
 
 	/**
 	 * Create a block from the selected transactions
 	 */
-	async function createBlock() {}
+	async function createBlock() {
+		const transactions = mempool().filter((_, i) => selectedTransactions()[i]);
+		const block = Block.createBlock(transactions);
+		await block.mine(chainSettingsStore.state.difficulty);
+		sendBlock(serialize(block));
+	}
 
 	return (
 		<Button

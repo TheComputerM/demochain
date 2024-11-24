@@ -8,6 +8,7 @@ import {
 import type { Room } from "trystero";
 import { joinRoom, selfId } from "trystero/mqtt";
 import {
+	addBlock,
 	blockchainStore,
 	chainSettingsStore,
 	createGenesisBlock,
@@ -16,6 +17,7 @@ import { addTransaction, mempoolStore } from "./blockchain/mempool";
 import { deserialize, serialize } from "./blockchain/serializer";
 import type { Transaction } from "./blockchain/transaction";
 import { logger } from "./logger";
+import type { Block } from "./blockchain/block";
 
 export const RoomContext = createContext<Room>();
 
@@ -25,7 +27,6 @@ export const RoomProvider: ParentComponent = (props) => {
 			appId: "demochain_rulezz",
 			relayUrls: [
 				"wss://broker.emqx.io:8084/mqtt",
-				"wss://mqtt.eclipseprojects.io:433/mqtt",
 				"wss://broker.hivemq.com:8884/mqtt",
 				"wss://test.mosquitto.org:8081/mqtt",
 			],
@@ -79,11 +80,18 @@ export const RoomProvider: ParentComponent = (props) => {
 
 	const [, getTransaction] = room.makeAction("send_tsx");
 	getTransaction((data) => {
-		const transaction = deserialize(data as Uint8Array) as Transaction;
+		const transaction = deserialize<Transaction>(data as Uint8Array);
 		logger.info(
 			`new transaction from ${transaction.sender} to ${transaction.recipient} of ${transaction.amount}`,
 		);
 		addTransaction(transaction);
+	});
+
+	const [, getBlock] = room.makeAction("send_block");
+	getBlock((data) => {
+		const block = deserialize<Block>(data as Uint8Array);
+		logger.info(`new block ${block.hash} received`);
+		addBlock(block);
 	});
 
 	return (
