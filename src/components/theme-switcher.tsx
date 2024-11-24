@@ -17,7 +17,7 @@ export default function ThemeSwitcher() {
 	});
 
 	return (
-		<IconButton variant="outline" onClick={() => setDarkMode((prev) => !prev)}>
+		<IconButton variant="ghost" onClick={() => setDarkMode((prev) => !prev)}>
 			<Show when={darkMode()} fallback={<IconMoonStars />}>
 				<IconSunFilled />
 			</Show>

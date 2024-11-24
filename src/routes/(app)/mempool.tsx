@@ -9,12 +9,8 @@ import { HStack, Stack } from "styled-system/jsx";
 import { Button } from "~/components/ui/button";
 import { Card } from "~/components/ui/card";
 import { Heading } from "~/components/ui/heading";
-import { Block } from "~/lib/blockchain/block";
-import { blockchainStore, chainSettingsStore } from "~/lib/blockchain/chain";
-import { mempoolStore } from "~/lib/blockchain/mempool";
-import { serialize } from "~/lib/blockchain/serializer";
+import { useBlockchain } from "~/lib/blockchain-context";
 import type { Transaction } from "~/lib/blockchain/transaction";
-import { useRoom } from "~/lib/room";
 
 const selectedTransactionsStore = new Store<boolean[]>([]);
 
@@ -68,17 +64,17 @@ const TransactionDisplay: Component<{
 };
 
 const MempoolDisplay: Component = () => {
-	const mempool = useStore(mempoolStore);
+	const mempool = useBlockchain().store.mempool;
 
 	createEffect(() => {
 		selectedTransactionsStore.setState(() =>
-			new Array(mempool().length).fill(false),
+			new Array(mempool.length).fill(false),
 		);
 	});
 
 	return (
 		<Stack>
-			<For each={mempool()}>
+			<For each={mempool}>
 				{(transaction, i) => (
 					<TransactionDisplay transaction={transaction} index={i()} />
 				)}
@@ -89,20 +85,11 @@ const MempoolDisplay: Component = () => {
 
 const MineTransactions: Component = () => {
 	const selectedTransactions = useStore(selectedTransactionsStore);
-	const mempool = useStore(mempoolStore);
-	const room = useRoom();
-
-	const [sendBlock] = room.makeAction("send_block");
 
 	/**
 	 * Create a block from the selected transactions
 	 */
-	async function createBlock() {
-		const transactions = mempool().filter((_, i) => selectedTransactions()[i]);
-		const block = Block.createBlock(transactions);
-		await block.mine(chainSettingsStore.state.difficulty);
-		sendBlock(serialize(block));
-	}
+	async function createBlock() {}
 
 	return (
 		<Button

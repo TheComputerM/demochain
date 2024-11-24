@@ -1,42 +1,65 @@
-import { Store } from "@tanstack/solid-store";
-import { selfId } from "trystero";
+import { type SetStoreFunction, createStore } from "solid-js/store";
 import { Block } from "./block";
 import { Transaction } from "./transaction";
 
-export const blockchainStore = new Store<Block[]>([]);
-export const chainSettingsStore = new Store<{
+export interface BlockchainSettings {
 	difficulty: number;
-}>({
-	difficulty: 1,
-});
-
-/**
- * Adds a block to the blockchain after verifying it is correct.
- */
-export async function addBlock(block: Block) {
-	const previousBlock = blockchainStore.state.at(-1)!;
-	if ((await previousBlock.calculateHash()) !== block.previousHash) {
-		throw new Error("Invalid previousHash");
-	}
-	if ((await block.calculateHash()) !== block.hash) {
-		throw new Error("Invalid block hash");
-	}
-
-	blockchainStore.setState((prev) => [...prev, block]);
 }
 
-/**
- * Creates the genesis block when there are no other nodes in the network.
- */
-export async function createGenesisBlock() {
-	if (blockchainStore.state.length !== 0) {
-		throw new Error("Genesis block already exists");
+export interface BlockchainState {
+	blocks: Block[];
+	settings: BlockchainSettings;
+	mempool: Transaction[];
+}
+
+export class Blockchain {
+	store: BlockchainState;
+	setStore: SetStoreFunction<BlockchainState>;
+
+	constructor(initial: BlockchainState) {
+		[this.store, this.setStore] = createStore(initial);
 	}
 
-	const block = new Block(0, Date.now(), "", "", 0, [
-		new Transaction("Creator", selfId, 1000),
-	]);
+	/**
+	 * Creates the genesis block when there are no other nodes in the network.
+	 */
+	async createGenesisBlock(selfId: string) {
+		if (this.store.blocks.length !== 0) {
+			throw new Error("Genesis block already exists");
+		}
 
-	await block.mine(chainSettingsStore.state.difficulty);
-	blockchainStore.setState(() => [block]);
+		const block = new Block(0, Date.now(), "", "", 0, [
+			new Transaction("Creator", selfId, 1000),
+		]);
+
+		await block.mine(this.store.settings.difficulty);
+		
+		this.setStore("blocks", 0, block);
+	}
+
+	/**
+	 * Adds a block to the blockchain after verifying it is correct.
+	 */
+	async appendBlock(block: Block) {
+		if (this.store.blocks.length === 0) {
+			throw new Error("There is no genesis block");
+		}
+
+		const previousBlock = this.store.blocks.at(-1)!;
+		if (previousBlock.hash !== block.previousHash) {
+			throw new Error("Invalid previousHash");
+		}
+		if (block.hash !== (await block.calculateHash())) {
+			throw new Error("Invalid block hash");
+		}
+
+		this.setStore("blocks", this.store.blocks.length, block);
+	}
+
+	/**
+	 * adds a transaction to the node's mempool.
+	 */
+	addTransaction(transaction: Transaction) {
+		this.setStore("mempool", this.store.mempool.length, transaction);
+	}
 }

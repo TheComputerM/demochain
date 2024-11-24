@@ -13,6 +13,7 @@ import { Container, Flex, Stack } from "styled-system/jsx";
 import ThemeSwitcher from "~/components/theme-switcher";
 import { IconButton } from "~/components/ui/icon-button";
 import { Tooltip } from "~/components/ui/tooltip";
+import { BlockchainProvider } from "~/lib/blockchain-context";
 import { RoomProvider } from "~/lib/room";
 
 export default function AppLayout(props: RouteSectionProps) {
@@ -84,7 +85,11 @@ export default function AppLayout(props: RouteSectionProps) {
 				</Stack>
 			</aside>
 			<Container mt="3" width="full">
-				<RoomProvider>{props.children}</RoomProvider>
+				<RoomProvider>
+					<BlockchainProvider>
+						{props.children}
+					</BlockchainProvider>
+				</RoomProvider>
 			</Container>
 		</Flex>
 	);

@@ -7,19 +7,9 @@ import {
 } from "solid-js";
 import type { Room } from "trystero";
 import { joinRoom, selfId } from "trystero/mqtt";
-import {
-	addBlock,
-	blockchainStore,
-	chainSettingsStore,
-	createGenesisBlock,
-} from "./blockchain/chain";
-import { addTransaction, mempoolStore } from "./blockchain/mempool";
-import { deserialize, serialize } from "./blockchain/serializer";
-import type { Transaction } from "./blockchain/transaction";
 import { logger } from "./logger";
-import type { Block } from "./blockchain/block";
 
-export const RoomContext = createContext<Room>();
+const RoomContext = createContext<Room>();
 
 export const RoomProvider: ParentComponent = (props) => {
 	const room = joinRoom(
@@ -36,63 +26,19 @@ export const RoomProvider: ParentComponent = (props) => {
 
 	logger.info(`Joined network as ${selfId}`);
 
-	// creates genesis block if it is the first node after 4s
 	onMount(() => {
-		setTimeout(async () => {
-			if (Object.keys(room.getPeers()).length === 0) {
-				logger.info("Creating genesis block");
-				await createGenesisBlock();
-			}
-		}, 4000);
-	});
+		room.onPeerJoin((peer) => {
+			logger.info(`Peer ${peer} joined the network`);
+			window.dispatchEvent(new CustomEvent("peer-join", { detail: peer }));
+		});
 
-	const [sendInitialization, getInitialization] = room.makeAction("init_sync");
-
-	room.onPeerJoin((peer) => {
-		logger.info(`Peer ${peer} joined the network`);
-		if (blockchainStore.state.length > 0) {
-			sendInitialization(
-				serialize({
-					blockchain: blockchainStore.state,
-					settings: chainSettingsStore.state,
-					mempool: mempoolStore.state,
-				}),
-			);
-		}
-	});
-
-	getInitialization((data) => {
-		if (blockchainStore.state.length === 0) {
-			logger.info("synced data with network");
-			// @ts-ignore
-			const { blockchain, settings, mempool } = deserialize(data as Uint8Array);
-			blockchainStore.setState(() => blockchain);
-			chainSettingsStore.setState(() => settings);
-			mempoolStore.setState(() => mempool);
-		}
-	});
-
-	room.onPeerLeave((peer) => {
-		logger.info(`Peer ${peer} is offline`);
+		room.onPeerLeave((peer) => {
+			logger.info(`Peer ${peer} is offline`);
+			window.dispatchEvent(new CustomEvent("peer-leave", { detail: peer }));
+		});
 	});
 
 	onCleanup(async () => await room.leave());
-
-	const [, getTransaction] = room.makeAction("send_tsx");
-	getTransaction((data) => {
-		const transaction = deserialize<Transaction>(data as Uint8Array);
-		logger.info(
-			`new transaction from ${transaction.sender} to ${transaction.recipient} of ${transaction.amount}`,
-		);
-		addTransaction(transaction);
-	});
-
-	const [, getBlock] = room.makeAction("send_block");
-	getBlock((data) => {
-		const block = deserialize<Block>(data as Uint8Array);
-		logger.info(`new block ${block.hash} received`);
-		addBlock(block);
-	});
 
 	return (
 		<RoomContext.Provider value={room}>{props.children}</RoomContext.Provider>

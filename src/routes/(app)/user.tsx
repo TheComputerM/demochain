@@ -1,15 +1,14 @@
-import { useStore } from "@tanstack/solid-store";
 import { Stack } from "styled-system/jsx";
 import { selfId } from "trystero";
 import { Heading } from "~/components/ui/heading";
 import { Table } from "~/components/ui/table";
 import { TransactionForm } from "~/components/wallet/transaction";
-import { blockchainStore } from "~/lib/blockchain/chain";
+import { useBlockchain } from "~/lib/blockchain-context";
 
 const walletBalance = () => {
-	const blockchain = useStore(blockchainStore);
+	const blocks = useBlockchain().store.blocks;
 	const balance = () =>
-		blockchain()
+		blocks
 			.flatMap((block) => block.transactions)
 			.reduce((acc, tx) => {
 				if (tx.recipient === selfId) return acc + tx.amount;

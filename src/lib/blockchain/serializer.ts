@@ -25,10 +25,4 @@ Tag.registerDecoder(
 		new Block(...(contents as ConstructorParameters<typeof Block>)),
 );
 
-export function serialize(value: unknown) {
-	return encode(value);
-}
-
-export function deserialize<T>(buffer: Uint8Array): T {
-	return decode(buffer);
-}
+export { encode, decode };

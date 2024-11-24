@@ -1,4 +1,3 @@
-import { blockchainStore } from "./chain";
 import type { Transaction } from "./transaction";
 
 export class Block {
@@ -43,13 +42,5 @@ export class Block {
 			this.nonce++;
 			this.hash = await this.calculateHash();
 		}
-	}
-
-	static createBlock(transactions: Transaction[]) {
-		const previousBlock = blockchainStore.state.at(-1);
-		if (!previousBlock) {
-			throw new Error("No previous block found");
-		}
-		return new Block(blockchainStore.state.length, Date.now(), "", previousBlock.hash, 0, transactions);
 	}
 }
