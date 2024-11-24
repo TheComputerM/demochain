@@ -10,7 +10,10 @@ import { Button } from "~/components/ui/button";
 import { Card } from "~/components/ui/card";
 import { Heading } from "~/components/ui/heading";
 import { useBlockchain } from "~/lib/blockchain-context";
+import { Block } from "~/lib/blockchain/block";
 import type { Transaction } from "~/lib/blockchain/transaction";
+import { useRoom } from "~/lib/room";
+import { encode } from "~/lib/blockchain/serializer";
 
 const selectedTransactionsStore = new Store<boolean[]>([]);
 
@@ -18,15 +21,16 @@ const TransactionDisplay: Component<{
 	transaction: Transaction;
 	index: number;
 }> = (props) => {
-	// TODO: select transaction based on index only
-	const selectedTransactions = useStore(selectedTransactionsStore);
-	const isSelected = () => selectedTransactions()[props.index];
-	const toggleSelected = () => {
+	const isSelected = useStore(
+		selectedTransactionsStore,
+		(state) => state[props.index],
+	);
+
+	const toggleSelected = () =>
 		selectedTransactionsStore.setState((state) => {
 			state[props.index] = !state[props.index];
 			return state;
 		});
-	};
 
 	return (
 		<Card.Root>
@@ -85,16 +89,31 @@ const MempoolDisplay: Component = () => {
 
 const MineTransactions: Component = () => {
 	const selectedTransactions = useStore(selectedTransactionsStore);
+	const blockchain = useBlockchain();
+	const room = useRoom();
+	const sendBlock = room.makeAction("sngl_blk")[0];
 
 	/**
 	 * Create a block from the selected transactions
 	 */
-	async function createBlock() {}
+	async function mineBlock() {
+		const block = new Block(
+			blockchain.store.blocks.length,
+			Date.now(),
+			"",
+			blockchain.store.blocks.at(-1)!.hash,
+			0,
+			blockchain.store.mempool.filter((_, i) => selectedTransactions()[i]),
+		);
+		await block.mine(blockchain.store.settings.difficulty);
+		blockchain.appendBlock(block);
+		sendBlock(encode(block));
+	}
 
 	return (
 		<Button
 			disabled={!selectedTransactions().find((x) => x)}
-			onClick={createBlock}
+			onClick={mineBlock}
 		>
 			Mine Selected Transactions
 		</Button>
