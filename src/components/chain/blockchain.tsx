@@ -1,9 +1,9 @@
 import { type Component, For } from "solid-js";
 import { Divider, Stack } from "styled-system/jsx";
+import { Card } from "~/components/ui/card";
+import { Table } from "~/components/ui/table";
 import { useBlockchain } from "~/lib/blockchain-context";
 import type { Block } from "~/lib/blockchain/block";
-import { Card } from "../ui/card";
-import { Table } from "../ui/table";
 
 export const BlockDisplay: Component<{ block: Block }> = (props) => {
 	return (
@@ -57,7 +57,8 @@ export const BlockDisplay: Component<{ block: Block }> = (props) => {
 };
 
 export const BlockchainDisplay: Component = () => {
-	const blocks = useBlockchain().store.blocks;
+	const blockchain = useBlockchain();
+	const blocks = blockchain.store.blocks;
 	return (
 		<Stack>
 			<For each={blocks}>{(block) => <BlockDisplay block={block} />}</For>
