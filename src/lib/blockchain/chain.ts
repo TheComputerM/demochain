@@ -1,8 +1,8 @@
 import { batch } from "solid-js";
 import { type SetStoreFunction, createStore, reconcile } from "solid-js/store";
+import { logger } from "../logger";
 import { Block } from "./block";
 import { Transaction } from "./transaction";
-import { logger } from "../logger";
 
 export interface BlockchainSettings {
 	difficulty: number;

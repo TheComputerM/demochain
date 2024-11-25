@@ -37,10 +37,6 @@ export default function UserPage() {
 					</Table.Row>
 				</Table.Body>
 			</Table.Root>
-
-			<Heading as="h2" textStyle="2xl">
-				Create Transaction
-			</Heading>
 			<TransactionForm />
 		</Stack>
 	);
