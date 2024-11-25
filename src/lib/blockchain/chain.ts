@@ -58,6 +58,12 @@ export class Blockchain {
 			throw new Error("Block does not meet difficulty requirements");
 		}
 
+		for (const transaction of block.transactions) {
+			if (this.getBalance(transaction.sender) < transaction.amount) {
+				throw new Error("Insufficient funds");
+			}
+		}
+
 		batch(() => {
 			this.setStore("blocks", this.store.blocks.length, block);
 			this.setStore(
@@ -97,5 +103,18 @@ export class Blockchain {
 		const endTime = new Date().getTime();
 		logger.info(`Validated blockchain in ${endTime - startTime}ms`);
 		return true;
+	}
+
+	/**
+	 * Returns the balance of a given address.
+	 */
+	getBalance(address: string) {
+		return this.store.blocks
+			.flatMap((block) => block.transactions)
+			.reduce((acc, transaction) => {
+				if (transaction.sender === address) return acc - transaction.amount;
+				if (transaction.recipient === address) return acc + transaction.amount;
+				return acc;
+			}, 0);
 	}
 }

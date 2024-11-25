@@ -5,21 +5,10 @@ import { Table } from "~/components/ui/table";
 import { TransactionForm } from "~/components/wallet/transaction";
 import { useBlockchain } from "~/lib/blockchain-context";
 
-const walletBalance = () => {
-	const blocks = useBlockchain().store.blocks;
-	const balance = () =>
-		blocks
-			.flatMap((block) => block.transactions)
-			.reduce((acc, tx) => {
-				if (tx.recipient === selfId) return acc + tx.amount;
-				if (tx.sender === selfId) return acc - tx.amount;
-				return acc;
-			}, 0);
-	return balance;
-};
-
 export default function UserPage() {
-	const balance = walletBalance();
+	const blockchain = useBlockchain();
+	const balance = () => blockchain.getBalance(selfId);
+
 	return (
 		<Stack gap="6">
 			<Heading as="h1" textStyle="4xl">
