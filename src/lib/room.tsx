@@ -11,6 +11,12 @@ import { logger } from "./logger";
 
 const RoomContext = createContext<Room>();
 
+export enum NetworkEvent {
+	STATE = "net_state",
+	TRANSACTION = "sngl_tsx",
+	BLOCK = "sngl_blk",
+}
+
 export const RoomProvider: ParentComponent = (props) => {
 	const room = joinRoom(
 		{

@@ -14,7 +14,7 @@ import { useBlockchain } from "~/lib/blockchain-context";
 import { Block } from "~/lib/blockchain/block";
 import type { Transaction } from "~/lib/blockchain/transaction";
 import { logger } from "~/lib/logger";
-import { useRoom } from "~/lib/room";
+import { NetworkEvent, useRoom } from "~/lib/room";
 
 const selectedTransactionsStore = new Store<boolean[]>([]);
 
@@ -92,7 +92,7 @@ const MineTransactions: Component = () => {
 	const selectedTransactions = useStore(selectedTransactionsStore);
 	const blockchain = useBlockchain();
 	const room = useRoom();
-	const sendBlock = room.makeAction("sngl_blk")[0];
+	const broadcastBlock = room.makeAction(NetworkEvent.BLOCK)[0];
 
 	/**
 	 * Create a block from the selected transactions
@@ -109,7 +109,7 @@ const MineTransactions: Component = () => {
 		await block.mine(blockchain.store.settings.difficulty);
 		blockchain.appendBlock(block);
 		logger.info(`Broadcasted block ${block.hash} at ${(new Date()).getTime()}`);
-		await sendBlock(encode(block));
+		await broadcastBlock(encode(block));
 	}
 
 	return (

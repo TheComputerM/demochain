@@ -3,13 +3,13 @@ import { HStack } from "styled-system/jsx";
 import { selfId } from "trystero";
 import { useBlockchain } from "~/lib/blockchain-context";
 import { Transaction } from "~/lib/blockchain/transaction";
-import { useRoom } from "~/lib/room";
+import { NetworkEvent, useRoom } from "~/lib/room";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 
 export const TransactionForm = () => {
 	const room = useRoom();
-	const sendTransaction = room.makeAction("sngl_tsx")[0];
+	const broadcastTransaction = room.makeAction(NetworkEvent.TRANSACTION)[0];
 	const blockchain = useBlockchain();
 
 	const handleSubmit = (e: SubmitEvent) => {
@@ -20,7 +20,7 @@ export const TransactionForm = () => {
 		const amount = Number.parseInt(formdata.get("amount") as string);
 		const transaction = new Transaction(selfId, wallet, amount, Date.now());
 		blockchain.addTransaction(transaction);
-		sendTransaction(encode(transaction));
+		broadcastTransaction(encode(transaction));
 	};
 	return (
 		<form onSubmit={handleSubmit}>

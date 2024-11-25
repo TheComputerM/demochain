@@ -11,7 +11,7 @@ import { selfId } from "trystero";
 import { Blockchain, type BlockchainState } from "~/lib/blockchain/chain";
 import type { Transaction } from "~/lib/blockchain/transaction";
 import { logger } from "~/lib/logger";
-import { useRoom } from "~/lib/room";
+import { NetworkEvent, useRoom } from "~/lib/room";
 import type { Block } from "./blockchain/block";
 
 const BlockchainContext = createContext<Blockchain>();
@@ -26,9 +26,11 @@ export const BlockchainProvider: ParentComponent = (props) => {
 		mempool: [],
 	});
 
-	const [syncState, getNetworkState] = room.makeAction("init_sync");
+	const [broadcastNetworkState, recieveNetworkState] = room.makeAction(
+		NetworkEvent.STATE,
+	);
 
-	getNetworkState(async (data) => {
+	recieveNetworkState(async (data) => {
 		if (blockchain.store.blocks.length === 0) {
 			const blockchainState = decode<BlockchainState>(data as Uint8Array);
 			if (await Blockchain.validate(blockchainState.blocks)) {
@@ -44,7 +46,7 @@ export const BlockchainProvider: ParentComponent = (props) => {
 			"peer-join",
 			(event) => {
 				const blockchainState = unwrap(blockchain.store);
-				syncState(encode(blockchainState), event.detail);
+				broadcastNetworkState(encode(blockchainState), event.detail);
 			},
 		);
 
@@ -57,14 +59,14 @@ export const BlockchainProvider: ParentComponent = (props) => {
 		}, 3000);
 	});
 
-	const getTransaction = room.makeAction("sngl_tsx")[1];
-	getTransaction((data) => {
+	const recieveTransaction = room.makeAction(NetworkEvent.TRANSACTION)[1];
+	recieveTransaction((data) => {
 		const transaction = decode<Transaction>(data as Uint8Array);
 		blockchain.addTransaction(transaction);
 	});
 
-	const getBlock = room.makeAction("sngl_blk")[1];
-	getBlock((data) => {
+	const recieveBlock = room.makeAction(NetworkEvent.BLOCK)[1];
+	recieveBlock((data) => {
 		const block = decode<Block>(data as Uint8Array);
 		logger.info(`Received block ${block.hash} at ${(new Date()).getTime()}`);
 		blockchain.appendBlock(block);
