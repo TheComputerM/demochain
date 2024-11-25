@@ -1,5 +1,5 @@
 import { Stack } from "styled-system/jsx";
-import { selfId } from "trystero";
+import { selfId } from "trystero/mqtt";
 import { Heading } from "~/components/ui/heading";
 import { Table } from "~/components/ui/table";
 import { TransactionForm } from "~/components/wallet/transaction";

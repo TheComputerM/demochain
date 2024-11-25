@@ -7,7 +7,7 @@ import {
 	useContext,
 } from "solid-js";
 import { reconcile, unwrap } from "solid-js/store";
-import { selfId } from "trystero";
+import { selfId } from "trystero/mqtt";
 import { Blockchain, type BlockchainState } from "~/lib/blockchain/chain";
 import type { Transaction } from "~/lib/blockchain/transaction";
 import { logger } from "~/lib/logger";

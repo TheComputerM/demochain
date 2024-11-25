@@ -1,7 +1,7 @@
 import { encode } from "cbor2";
 import { createStore } from "solid-js/store";
 import { Stack } from "styled-system/jsx";
-import { selfId } from "trystero";
+import { selfId } from "trystero/mqtt";
 import { useBlockchain } from "~/lib/blockchain-context";
 import { Transaction } from "~/lib/blockchain/transaction";
 import { NetworkEvent, useRoom } from "~/lib/room";
