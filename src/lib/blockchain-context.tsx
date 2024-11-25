@@ -6,7 +6,7 @@ import {
 	onMount,
 	useContext,
 } from "solid-js";
-import { unwrap } from "solid-js/store";
+import { reconcile, unwrap } from "solid-js/store";
 import { selfId } from "trystero";
 import { Blockchain, type BlockchainState } from "~/lib/blockchain/chain";
 import type { Transaction } from "~/lib/blockchain/transaction";
@@ -34,7 +34,7 @@ export const BlockchainProvider: ParentComponent = (props) => {
 		if (blockchain.store.blocks.length === 0) {
 			const blockchainState = decode<BlockchainState>(data as Uint8Array);
 			if (await Blockchain.validate(blockchainState.blocks)) {
-				blockchain.setStore(blockchainState);
+				blockchain.setStore(reconcile(blockchainState));
 				logger.info("State synced with the network");
 			}
 		}
