@@ -5,5 +5,8 @@ export default defineConfig({
 	ssr: false,
 	vite: {
 		plugins: [tsconfigPaths()],
+		optimizeDeps: {
+			exclude: ["@tabler/icons-solidjs"]
+		}
 	},
 });
