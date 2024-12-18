@@ -1,10 +1,13 @@
 import { defineConfig } from "@pandacss/dev";
+import { createPreset } from "@park-ui/panda-preset";
+import sky from "@park-ui/panda-preset/colors/sky";
+import slate from "@park-ui/panda-preset/colors/slate";
 
 export default defineConfig({
 	// Whether to use css reset
 	preflight: true,
 
-	presets: ["@pandacss/preset-base", "@park-ui/panda-preset"],
+	presets: [createPreset({ accentColor: sky, grayColor: slate, radius: "md" })],
 
 	// Where to look for your css declarations
 	include: ["./src/**/*.{js,jsx,ts,tsx}"],
@@ -14,8 +17,8 @@ export default defineConfig({
 
 	globalVars: {
 		extend: {
-			'--global-font-body': "'Outfit Variable', sans-serif"
-		}
+			"--global-font-body": "'Outfit Variable', sans-serif",
+		},
 	},
 
 	// Useful for theme customization

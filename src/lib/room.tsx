@@ -20,7 +20,8 @@ export enum NetworkEvent {
 export const RoomProvider: ParentComponent = (props) => {
 	const room = joinRoom(
 		{
-			appId: "https://relay-9e877-default-rtdb.asia-southeast1.firebasedatabase.app",
+			appId:
+				"https://relay-9e877-default-rtdb.asia-southeast1.firebasedatabase.app",
 			rootPath: "__demochain__/network_code",
 		},
 		"main",
