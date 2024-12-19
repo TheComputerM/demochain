@@ -1,14 +1,6 @@
-import { makeEventListener } from "@solid-primitives/event-listener";
-import { decode, encode } from "cbor2";
-import {
-	type ParentComponent,
-	createContext,
-	onMount,
-	useContext,
-} from "solid-js";
-import { reconcile, unwrap } from "solid-js/store";
-import { selfId } from "trystero/firebase";
-import { Blockchain, type BlockchainState } from "~/lib/blockchain/chain";
+import { decode } from "cbor2";
+import { type ParentComponent, createContext, useContext } from "solid-js";
+import { Blockchain } from "~/lib/blockchain/chain";
 import type { Transaction } from "~/lib/blockchain/transaction";
 import { logger } from "~/lib/logger";
 import { NetworkEvent, useRoom } from "~/lib/room-context";
@@ -24,39 +16,6 @@ export const BlockchainProvider: ParentComponent = (props) => {
 			difficulty: 1,
 		},
 		mempool: [],
-	});
-
-	const [broadcastNetworkState, recieveNetworkState] = room.makeAction(
-		NetworkEvent.STATE,
-	);
-
-	recieveNetworkState(async (data) => {
-		if (blockchain.store.blocks.length === 0) {
-			const blockchainState = decode<BlockchainState>(data as Uint8Array);
-			if (await Blockchain.validate(blockchainState.blocks)) {
-				blockchain.setStore(reconcile(blockchainState));
-				logger.info("State synced with the network");
-			}
-		}
-	});
-
-	onMount(() => {
-		makeEventListener<{ "peer-join": CustomEvent }>(
-			window,
-			"peer-join",
-			(event) => {
-				const blockchainState = unwrap(blockchain.store);
-				broadcastNetworkState(encode(blockchainState), event.detail);
-			},
-		);
-
-		// create genesis block if there are no blocks after 3s
-		setTimeout(async () => {
-			if (blockchain.store.blocks.length === 0) {
-				await blockchain.createGenesisBlock(selfId);
-				logger.info("Genesis block created");
-			}
-		}, 3000);
 	});
 
 	const recieveTransaction = room.makeAction(NetworkEvent.TRANSACTION)[1];
