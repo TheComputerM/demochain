@@ -1,8 +1,4 @@
-import {
-	IconArrowNarrowRight,
-	IconMinus,
-	IconPlus,
-} from "@tabler/icons-solidjs";
+import TablerArrowNarrowRight from '~icons/tabler/arrow-narrow-right'
 import { Store, useStore } from "@tanstack/solid-store";
 import { encode } from "cbor2";
 import { type Component, For, Show, createEffect } from "solid-js";
@@ -40,7 +36,7 @@ const TransactionDisplay: Component<{
 					<Stack>
 						<Card.Title display="flex" alignItems="center" gap="2">
 							{props.transaction.sender}
-							<IconArrowNarrowRight />
+							<TablerArrowNarrowRight />
 							{props.transaction.recipient}
 						</Card.Title>
 						<Card.Description>{props.transaction.amount}</Card.Description>
@@ -49,16 +45,7 @@ const TransactionDisplay: Component<{
 						variant={isSelected() ? "outline" : "solid"}
 						onClick={toggleSelected}
 					>
-						<Show
-							when={isSelected()}
-							fallback={
-								<>
-									<IconPlus />
-									Add to Block
-								</>
-							}
-						>
-							<IconMinus />
+						<Show when={isSelected()} fallback="Add to Block">
 							Remove
 						</Show>
 					</Button>

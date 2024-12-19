@@ -1,5 +1,15 @@
+import {
+	type SubmitHandler,
+	createForm,
+	maxLength,
+	minLength,
+	pattern,
+	required,
+	setValues,
+} from "@modular-forms/solid";
 import { useNavigate } from "@solidjs/router";
-import { IconBrandGithub } from "@tabler/icons-solidjs";
+import TablerBrandGithub from "~icons/tabler/brand-github";
+import { onMount } from "solid-js";
 import { css } from "styled-system/css";
 import { Center, Container, Divider, HStack, Stack } from "styled-system/jsx";
 import { GridPattern } from "~/components/mystic/grid-pattern";
@@ -12,45 +22,87 @@ import { IconButton } from "~/components/ui/icon-button";
 function EntryForm() {
 	const navigate = useNavigate();
 
-	function handleSubmit(event: SubmitEvent) {
-		event.preventDefault();
-		const formdata = new FormData(event.target as HTMLFormElement);
-		const network = formdata.get("network");
-		const wallet = formdata.get("wallet");
+	type SettingsForm = {
+		network: string;
+		wallet: string;
+	};
 
-		sessionStorage.setItem("network", network as string);
+	const [settingsForm, { Form, Field: FormField }] = createForm<SettingsForm>();
 
-		navigate("/user");
-	}
+	onMount(() => {
+		setValues(settingsForm, {
+			network: sessionStorage.getItem("network") ?? "",
+			wallet: sessionStorage.getItem("wallet") ?? "",
+		});
+	});
+
+	const handleSubmit: SubmitHandler<SettingsForm> = (values, event) => {
+		sessionStorage.setItem("network", values.network);
+		sessionStorage.setItem("wallet", values.wallet);
+		navigate("/console");
+	};
 
 	return (
 		<Container maxWidth="md" width="full" zIndex={5}>
-			<Stack
-				gap="3"
-				backgroundColor="bg.default"
-				borderWidth="1"
-				borderRadius="l2"
-				p="4"
-			>
-				<form style={{ display: "contents" }} onSubmit={handleSubmit}>
-					<Field.Root>
-						<Field.Label>Network Code*</Field.Label>
-						<Field.Input name="network" placeholder="random_code" />
-						<Field.HelperText>
-							Share and use it to connect to the same network
-						</Field.HelperText>
-					</Field.Root>
-					<Field.Root>
-						<Field.Label>Wallet Seed</Field.Label>
-						<Field.Input name="wallet" placeholder="passphrase" />
-						<Field.HelperText>Seed used to generate your keys</Field.HelperText>
-					</Field.Root>
+			<Form style={{ display: "contents" }} onSubmit={handleSubmit}>
+				<Stack
+					gap="3"
+					backgroundColor="bg.default"
+					borderWidth="1"
+					borderRadius="l2"
+					p="4"
+				>
+					<FormField
+						name="network"
+						validate={[
+							required("Network ID is required"),
+							minLength(4, "Network ID should be at least 4 characters"),
+							maxLength(12, "Network ID should be at most 12 characters"),
+							pattern(
+								/[a-zA-Z]+(_[a-zA-Z]+)*/,
+								"Network ID should be snake_case",
+							),
+						]}
+					>
+						{(field, props) => (
+							<Field.Root invalid={field.error.length > 0}>
+								<Field.Label>Network Code*</Field.Label>
+								<Field.Input
+									{...props}
+									value={field.value}
+									type="text"
+									placeholder="random_code"
+								/>
+								<Field.HelperText>
+									Share and use it to connect to the same network
+								</Field.HelperText>
+								<Field.ErrorText>{field.error}</Field.ErrorText>
+							</Field.Root>
+						)}
+					</FormField>
+					<FormField name="wallet">
+						{(field, props) => (
+							<Field.Root invalid={field.error.length > 0}>
+								<Field.Label>Wallet Seed</Field.Label>
+								<Field.Input
+									{...props}
+									value={field.value}
+									type="text"
+									placeholder="passphrase"
+								/>
+								<Field.HelperText>
+									Seed used to generate your keys
+								</Field.HelperText>
+								<Field.ErrorText>{field.error}</Field.ErrorText>
+							</Field.Root>
+						)}
+					</FormField>
 					<Divider />
 					<Button size="2xl" type="submit">
 						Enter the App
 					</Button>
-				</form>
-			</Stack>
+				</Stack>
+			</Form>
 		</Container>
 	);
 }
@@ -71,7 +123,7 @@ export default function HomePage() {
 										{...forwardProps()}
 										href="https://github.com/TheComputerM/demochain"
 									>
-										<IconBrandGithub />
+										<TablerBrandGithub />
 									</a>
 								)}
 							/>

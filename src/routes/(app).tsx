@@ -1,11 +1,10 @@
 import { A, type RouteSectionProps } from "@solidjs/router";
-import {
-	IconLogout,
-	IconPick,
-	IconTerminal2,
-	IconTopologyFull,
-	IconWallet,
-} from "@tabler/icons-solidjs";
+import TablerWallet from '~icons/tabler/wallet'
+import TablerLogout from '~icons/tabler/logout'
+import TablerPick from '~icons/tabler/pick'
+import TablerTerminal2 from '~icons/tabler/terminal-2'
+import TablerTopologyFull from '~icons/tabler/topology-full'
+import { clientOnly } from "node_modules/@solidjs/start/dist";
 import { For } from "solid-js";
 import { Portal } from "solid-js/web";
 import { css } from "styled-system/css";
@@ -14,15 +13,18 @@ import ThemeSwitcher from "~/components/theme-switcher";
 import { IconButton } from "~/components/ui/icon-button";
 import { Tooltip } from "~/components/ui/tooltip";
 import { BlockchainProvider } from "~/lib/blockchain-context";
-import { RoomProvider } from "~/lib/room";
 import "~/lib/utils/register-encoder";
+
+const RoomProvider = clientOnly(() =>
+	import("~/lib/room").then((m) => ({ default: m.RoomProvider })),
+);
 
 export default function AppLayout(props: RouteSectionProps) {
 	const routes = [
-		{ icon: IconWallet, id: "user", label: "Wallet" },
-		{ icon: IconTopologyFull, id: "network", label: "Network" },
-		{ icon: IconPick, id: "mempool", label: "Mempool" },
-		{ icon: IconTerminal2, id: "console", label: "Console" },
+		{ icon: TablerWallet, id: "user", label: "Wallet" },
+		{ icon: TablerTopologyFull, id: "network", label: "Network" },
+		{ icon: TablerPick, id: "mempool", label: "Mempool" },
+		{ icon: TablerTerminal2, id: "console", label: "Console" },
 	];
 	return (
 		<Flex>
@@ -79,7 +81,7 @@ export default function AppLayout(props: RouteSectionProps) {
 					<IconButton
 						asChild={(forwardProps) => (
 							<A {...forwardProps()} href="/">
-								<IconLogout />
+								<TablerLogout />
 							</A>
 						)}
 					/>
