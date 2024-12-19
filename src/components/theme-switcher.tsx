@@ -1,8 +1,8 @@
 import { makePersisted } from "@solid-primitives/storage";
 import { Show, createEffect, createSignal } from "solid-js";
-import { IconButton } from "./ui/icon-button";
 import TablerMoonStars from "~icons/tabler/moon-stars";
 import TablerSunFilled from "~icons/tabler/sun-filled";
+import { IconButton } from "./ui/icon-button";
 
 export default function ThemeSwitcher() {
 	const [darkMode, setDarkMode] = makePersisted(createSignal(false), {

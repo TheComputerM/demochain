@@ -1,9 +1,4 @@
 import { A, type RouteSectionProps } from "@solidjs/router";
-import TablerWallet from '~icons/tabler/wallet'
-import TablerLogout from '~icons/tabler/logout'
-import TablerPick from '~icons/tabler/pick'
-import TablerTerminal2 from '~icons/tabler/terminal-2'
-import TablerTopologyFull from '~icons/tabler/topology-full'
 import { clientOnly } from "node_modules/@solidjs/start/dist";
 import { For } from "solid-js";
 import { Portal } from "solid-js/web";
@@ -13,6 +8,11 @@ import ThemeSwitcher from "~/components/theme-switcher";
 import { IconButton } from "~/components/ui/icon-button";
 import { Tooltip } from "~/components/ui/tooltip";
 import { BlockchainProvider } from "~/lib/blockchain-context";
+import TablerLogout from "~icons/tabler/logout";
+import TablerPick from "~icons/tabler/pick";
+import TablerTerminal2 from "~icons/tabler/terminal-2";
+import TablerTopologyFull from "~icons/tabler/topology-full";
+import TablerWallet from "~icons/tabler/wallet";
 import "~/lib/utils/register-encoder";
 
 const RoomProvider = clientOnly(() =>

@@ -1,4 +1,3 @@
-import TablerArrowNarrowRight from '~icons/tabler/arrow-narrow-right'
 import { Store, useStore } from "@tanstack/solid-store";
 import { encode } from "cbor2";
 import { type Component, For, Show, createEffect } from "solid-js";
@@ -11,6 +10,7 @@ import { Block } from "~/lib/blockchain/block";
 import type { Transaction } from "~/lib/blockchain/transaction";
 import { logger } from "~/lib/logger";
 import { NetworkEvent, useRoom } from "~/lib/room";
+import TablerArrowNarrowRight from "~icons/tabler/arrow-narrow-right";
 
 const selectedTransactionsStore = new Store<boolean[]>([]);
 

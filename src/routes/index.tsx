@@ -8,7 +8,6 @@ import {
 	setValues,
 } from "@modular-forms/solid";
 import { useNavigate } from "@solidjs/router";
-import TablerBrandGithub from "~icons/tabler/brand-github";
 import { onMount } from "solid-js";
 import { css } from "styled-system/css";
 import { Center, Container, Divider, HStack, Stack } from "styled-system/jsx";
@@ -18,6 +17,7 @@ import { Button } from "~/components/ui/button";
 import { Field } from "~/components/ui/field";
 import { Heading } from "~/components/ui/heading";
 import { IconButton } from "~/components/ui/icon-button";
+import TablerBrandGithub from "~icons/tabler/brand-github";
 
 function EntryForm() {
 	const navigate = useNavigate();
