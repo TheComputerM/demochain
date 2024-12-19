@@ -11,7 +11,7 @@ import { selfId } from "trystero/firebase";
 import { Blockchain, type BlockchainState } from "~/lib/blockchain/chain";
 import type { Transaction } from "~/lib/blockchain/transaction";
 import { logger } from "~/lib/logger";
-import { NetworkEvent, useRoom } from "~/lib/room";
+import { NetworkEvent, useRoom } from "~/lib/room-context";
 import type { Block } from "./blockchain/block";
 
 const BlockchainContext = createContext<Blockchain>();

@@ -4,7 +4,7 @@ import { Stack } from "styled-system/jsx";
 import { selfId } from "trystero/firebase";
 import { useBlockchain } from "~/lib/blockchain-context";
 import { Transaction } from "~/lib/blockchain/transaction";
-import { NetworkEvent, useRoom } from "~/lib/room";
+import { NetworkEvent, useRoom } from "~/lib/room-context";
 import { Button } from "../ui/button";
 import { Card } from "../ui/card";
 import { Field } from "../ui/field";

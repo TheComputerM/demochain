@@ -9,7 +9,7 @@ import { useBlockchain } from "~/lib/blockchain-context";
 import { Block } from "~/lib/blockchain/block";
 import type { Transaction } from "~/lib/blockchain/transaction";
 import { logger } from "~/lib/logger";
-import { NetworkEvent, useRoom } from "~/lib/room";
+import { NetworkEvent, useRoom } from "~/lib/room-context";
 import TablerArrowNarrowRight from "~icons/tabler/arrow-narrow-right";
 
 const selectedTransactionsStore = new Store<boolean[]>([]);

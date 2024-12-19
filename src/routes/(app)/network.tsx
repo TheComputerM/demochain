@@ -1,11 +1,11 @@
 import { makeEventListener } from "@solid-primitives/event-listener";
 import { createSignal } from "solid-js";
-import { Divider, Stack } from "styled-system/jsx";
-import { BlockchainDisplay } from "~/components/chain/blockchain";
+import { Divider, Grid, Stack } from "styled-system/jsx";
+import { selfId } from "trystero/firebase";
 import { Heading } from "~/components/ui/heading";
 import { Table } from "~/components/ui/table";
 import { useBlockchain } from "~/lib/blockchain-context";
-import { useRoom } from "~/lib/room";
+import { useRoom } from "~/lib/room-context";
 
 function getConnectedPeers() {
 	const room = useRoom();
@@ -23,6 +23,14 @@ function NetworkSettings() {
 		<Table.Root>
 			<Table.Body>
 				<Table.Row>
+					<Table.Header>Network ID</Table.Header>
+					<Table.Cell>{sessionStorage.getItem("network")}</Table.Cell>
+				</Table.Row>
+				<Table.Row>
+					<Table.Header>Peer ID</Table.Header>
+					<Table.Cell>{selfId}</Table.Cell>
+				</Table.Row>
+				<Table.Row>
 					<Table.Header>Difficulty</Table.Header>
 					<Table.Cell>{blockchain.store.settings.difficulty}</Table.Cell>
 				</Table.Row>
@@ -35,6 +43,10 @@ function NetworkSettings() {
 	);
 }
 
+function PeerGrid() {
+	return <Grid>TODO</Grid>;
+}
+
 export default function NetworkPage() {
 	return (
 		<Stack gap="6">
@@ -42,14 +54,14 @@ export default function NetworkPage() {
 				Network
 			</Heading>
 			<Heading as="h2" textStyle="2xl">
-				Settings
+				Details
 			</Heading>
 			<NetworkSettings />
 			<Divider my="3" />
 			<Heading as="h2" textStyle="2xl">
-				Chain
+				Peers
 			</Heading>
-			<BlockchainDisplay />
+			<PeerGrid />
 		</Stack>
 	);
 }

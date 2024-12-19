@@ -7,7 +7,7 @@ import { Container, Flex, Stack } from "styled-system/jsx";
 import ThemeSwitcher from "~/components/theme-switcher";
 import { IconButton } from "~/components/ui/icon-button";
 import { Tooltip } from "~/components/ui/tooltip";
-import { BlockchainProvider } from "~/lib/blockchain-context";
+import TablerChartDots3Filled from "~icons/tabler/chart-dots-3-filled";
 import TablerLogout from "~icons/tabler/logout";
 import TablerPick from "~icons/tabler/pick";
 import TablerTerminal2 from "~icons/tabler/terminal-2";
@@ -16,13 +16,19 @@ import TablerWallet from "~icons/tabler/wallet";
 import "~/lib/utils/register-encoder";
 
 const RoomProvider = clientOnly(() =>
-	import("~/lib/room").then((m) => ({ default: m.RoomProvider })),
+	import("~/lib/room-context").then((m) => ({ default: m.RoomProvider })),
+);
+const BlockchainProvider = clientOnly(() =>
+	import("~/lib/blockchain-context").then((m) => ({
+		default: m.BlockchainProvider,
+	})),
 );
 
 export default function AppLayout(props: RouteSectionProps) {
 	const routes = [
-		{ icon: TablerWallet, id: "user", label: "Wallet" },
+		{ icon: TablerWallet, id: "wallet", label: "Wallet" },
 		{ icon: TablerTopologyFull, id: "network", label: "Network" },
+		{ icon: TablerChartDots3Filled, id: "blockchain", label: "Blockchain" },
 		{ icon: TablerPick, id: "mempool", label: "Mempool" },
 		{ icon: TablerTerminal2, id: "console", label: "Console" },
 	];

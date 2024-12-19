@@ -18,13 +18,18 @@ export enum NetworkEvent {
 }
 
 export const RoomProvider: ParentComponent = (props) => {
+	const networkId = sessionStorage.getItem("network");
+	if (!networkId) {
+		throw new Error("Network ID is not present in sesssion storage");
+	}
+
 	const room = joinRoom(
 		{
 			appId:
 				"https://relay-9e877-default-rtdb.asia-southeast1.firebasedatabase.app",
-			rootPath: "__demochain__/network_code",
+			rootPath: "__demochain__",
 		},
-		"main",
+		networkId,
 	);
 
 	logger.info(`Joined network as ${selfId}`);
