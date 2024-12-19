@@ -25,7 +25,7 @@ export default function ConsolePage() {
 						{(log) => (
 							<Table.Row>
 								<Table.Cell>{log.level}</Table.Cell>
-								<Table.Cell>{log.message}</Table.Cell>
+								<Table.Cell>{log.args[0]}</Table.Cell>
 							</Table.Row>
 						)}
 					</For>
