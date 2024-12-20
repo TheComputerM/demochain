@@ -38,13 +38,12 @@ export default function WalletPage() {
 	const blockchain = useBlockchain();
 	const balance = () => blockchain.getBalance(selfId);
 	const wallet = useWallet();
-	const [keys] = createResource(async () =>
-		(
+	const [keys] = createResource(
+		async () =>
 			await Promise.all([
-				wallet.exportHex("public"),
-				wallet.exportHex("private"),
-			])
-		).map(Wallet.arrayBufferToHex),
+				Wallet.exportHex(wallet.public),
+				Wallet.exportHex(wallet.private),
+			]),
 	);
 
 	return (

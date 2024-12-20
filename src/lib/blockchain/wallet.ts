@@ -21,17 +21,14 @@ export class Wallet {
 		return new Wallet(keys.publicKey, keys.privateKey);
 	}
 
-	/**
-	 * Converts an array buffer into a hex string
-	 */
-	static arrayBufferToHex(buffer: ArrayBuffer) {
+	static async exportBuffer(key: CryptoKey) {
+		return subtle.exportKey(key.type === "public" ? "raw" : "pkcs8", key);
+	}
+	
+	static async exportHex(key: CryptoKey) {
+		const buffer = await Wallet.exportBuffer(key);
 		return [...new Uint8Array(buffer)]
 			.map((x) => x.toString(16).padStart(2, "0"))
 			.join("");
-	}
-
-	async exportHex(which: "public" | "private" = "public") {
-		if (which === "public") return subtle.exportKey("raw", this.public);
-		return subtle.exportKey("pkcs8", this.private);
 	}
 }
