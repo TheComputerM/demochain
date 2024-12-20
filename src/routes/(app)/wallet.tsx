@@ -1,4 +1,6 @@
-import { Stack } from "styled-system/jsx";
+import { Grid, Stack } from "styled-system/jsx";
+import { Balance } from "~/components/chain/balance";
+import { CreateTransaction } from "~/components/chain/create-transaction";
 import { KeyDisplay } from "~/components/chain/key-display";
 import { Heading } from "~/components/ui/heading";
 import { Table } from "~/components/ui/table";
@@ -31,10 +33,15 @@ export default function WalletPage() {
 					</Table.Row>
 					<Table.Row>
 						<Table.Header>Balance</Table.Header>
-						<Table.Cell>{balance()}</Table.Cell>
+						<Table.Cell>
+							<Balance>{balance()}</Balance>
+						</Table.Cell>
 					</Table.Row>
 				</Table.Body>
 			</Table.Root>
+			<Grid columns={2}>
+				<CreateTransaction />
+			</Grid>
 		</Stack>
 	);
 }

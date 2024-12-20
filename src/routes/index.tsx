@@ -27,10 +27,10 @@ function EntryForm() {
 		wallet: string;
 	};
 
-	const [settingsForm, { Form, Field: FormField }] = createForm<SettingsForm>();
+	const [form, { Form, Field: FormField }] = createForm<SettingsForm>();
 
 	onMount(() => {
-		setValues(settingsForm, {
+		setValues(form, {
 			network: sessionStorage.getItem("network") ?? "",
 			wallet: sessionStorage.getItem("wallet") ?? "",
 		});

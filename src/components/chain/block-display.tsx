@@ -3,6 +3,7 @@ import { Divider } from "styled-system/jsx";
 import { Card } from "~/components/ui/card";
 import { Table } from "~/components/ui/table";
 import type { Block } from "~/lib/blockchain/block";
+import { Balance } from "./balance";
 import { KeyDisplay } from "./key-display";
 
 export const BlockDisplay: Component<{ block: Block }> = (props) => {
@@ -52,7 +53,9 @@ export const BlockDisplay: Component<{ block: Block }> = (props) => {
 									<Table.Cell>
 										<KeyDisplay value={transaction.recipient} />
 									</Table.Cell>
-									<Table.Cell>{transaction.amount}</Table.Cell>
+									<Table.Cell>
+										<Balance>{transaction.amount}</Balance>
+									</Table.Cell>
 								</Table.Row>
 							)}
 						</For>
