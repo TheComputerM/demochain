@@ -14,6 +14,7 @@ import TablerTerminal2 from "~icons/tabler/terminal-2";
 import TablerTopologyFull from "~icons/tabler/topology-full";
 import TablerWallet from "~icons/tabler/wallet";
 import "~/lib/utils/register-encoder";
+import { WalletProvider } from "~/lib/wallet-context";
 
 const RoomProvider = clientOnly(() =>
 	import("~/lib/room-context").then((m) => ({ default: m.RoomProvider })),
@@ -95,7 +96,9 @@ export default function AppLayout(props: RouteSectionProps) {
 			</aside>
 			<Container mt="3" width="full">
 				<RoomProvider>
-					<BlockchainProvider>{props.children}</BlockchainProvider>
+					<BlockchainProvider>
+						<WalletProvider>{props.children}</WalletProvider>
+					</BlockchainProvider>
 				</RoomProvider>
 			</Container>
 		</Flex>

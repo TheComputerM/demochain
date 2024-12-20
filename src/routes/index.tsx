@@ -1,9 +1,9 @@
 import {
 	type SubmitHandler,
 	createForm,
+	custom,
 	maxLength,
 	minLength,
-	pattern,
 	required,
 	setValues,
 } from "@modular-forms/solid";
@@ -58,8 +58,9 @@ function EntryForm() {
 							required("Network ID is required"),
 							minLength(4, "Network ID should be at least 4 characters"),
 							maxLength(12, "Network ID should be at most 12 characters"),
-							pattern(
-								/[a-zA-Z]+(_[a-zA-Z]+)*/,
+							custom(
+								(value) =>
+									!value?.includes(" ") && value === value?.toLowerCase(),
 								"Network ID should be snake_case",
 							),
 						]}
