@@ -1,12 +1,12 @@
 export class Transaction {
-	sender: string;
-	recipient: string;
+	sender: Uint8Array;
+	recipient: Uint8Array;
 	amount: number;
 	timestamp: number;
 
 	constructor(
-		sender: string,
-		recipient: string,
+		sender: Uint8Array,
+		recipient: Uint8Array,
 		amount: number,
 		timestamp: number,
 	) {

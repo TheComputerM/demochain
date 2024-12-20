@@ -3,6 +3,7 @@ import { type SetStoreFunction, createStore, reconcile } from "solid-js/store";
 import { logger } from "../logger";
 import { Block } from "./block";
 import { Transaction } from "./transaction";
+import { Wallet } from "./wallet";
 
 export interface BlockchainSettings {
 	difficulty: number;
@@ -25,13 +26,13 @@ export class Blockchain {
 	/**
 	 * Creates the genesis block when there are no other nodes in the network.
 	 */
-	async createGenesisBlock(selfId: string) {
+	async createGenesisBlock(publicKey: Uint8Array) {
 		if (this.store.blocks.length !== 0) {
 			throw new Error("Genesis block already exists");
 		}
 
 		const block = new Block(0, Date.now(), "", "", 0, [
-			new Transaction("Creator", selfId, 1000, Date.now()),
+			new Transaction(new Uint8Array([1, 2, 3]), publicKey, 1000, Date.now()),
 		]);
 
 		await block.mine(this.store.settings.difficulty);
@@ -108,12 +109,14 @@ export class Blockchain {
 	/**
 	 * Returns the balance of a given address.
 	 */
-	getBalance(address: string) {
+	getBalance(address: Uint8Array) {
 		return this.store.blocks
 			.flatMap((block) => block.transactions)
 			.reduce((acc, transaction) => {
-				if (transaction.sender === address) return acc - transaction.amount;
-				if (transaction.recipient === address) return acc + transaction.amount;
+				if (Wallet.compareKeys(transaction.sender, address))
+					return acc - transaction.amount;
+				if (Wallet.compareKeys(transaction.recipient, address))
+					return acc + transaction.amount;
 				return acc;
 			}, 0);
 	}

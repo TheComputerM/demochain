@@ -4,6 +4,7 @@ import { Card } from "~/components/ui/card";
 import { Table } from "~/components/ui/table";
 import { useBlockchain } from "~/lib/blockchain-context";
 import type { Block } from "~/lib/blockchain/block";
+import { KeyDisplay } from "./key-display";
 
 export const BlockDisplay: Component<{ block: Block }> = (props) => {
 	return (
@@ -43,8 +44,12 @@ export const BlockDisplay: Component<{ block: Block }> = (props) => {
 						<For each={props.block.transactions}>
 							{(transaction) => (
 								<Table.Row>
-									<Table.Cell>{transaction.sender}</Table.Cell>
-									<Table.Cell>{transaction.recipient}</Table.Cell>
+									<Table.Cell>
+										<KeyDisplay value={transaction.sender} />
+									</Table.Cell>
+									<Table.Cell>
+										<KeyDisplay value={transaction.recipient} />
+									</Table.Cell>
 									<Table.Cell>{transaction.amount}</Table.Cell>
 								</Table.Row>
 							)}
