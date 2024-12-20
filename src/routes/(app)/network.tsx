@@ -1,23 +1,18 @@
-import { makeEventListener } from "@solid-primitives/event-listener";
-import { createSignal } from "solid-js";
-import { Divider, Grid, Stack } from "styled-system/jsx";
+import { type Component, For, Suspense, createResource } from "solid-js";
+import { Divider, Grid, HStack, Stack } from "styled-system/jsx";
 import { selfId } from "trystero/firebase";
+import { KeyDisplay } from "~/components/chain/key-display";
+import { Card } from "~/components/ui/card";
 import { Heading } from "~/components/ui/heading";
+import { IconButton } from "~/components/ui/icon-button";
 import { Table } from "~/components/ui/table";
 import { useBlockchain } from "~/lib/blockchain-context";
 import { useRoom } from "~/lib/room-context";
-
-function getConnectedPeers() {
-	const room = useRoom();
-	const [peers, setPeers] = createSignal(Object.keys(room.getPeers()).length);
-	makeEventListener(window, "peer-join", () => setPeers((x) => x + 1));
-	makeEventListener(window, "peer-leave", () => setPeers((x) => x - 1));
-	return peers;
-}
+import TablerRefresh from "~icons/tabler/refresh";
 
 function NetworkSettings() {
 	const blockchain = useBlockchain();
-	const connectedPeers = getConnectedPeers();
+	const connectedPeers = () => Object.keys(blockchain.store.peers).length;
 
 	return (
 		<Table.Root>
@@ -43,8 +38,51 @@ function NetworkSettings() {
 	);
 }
 
+const PeerCard: Component<{ peerId: string; key: Uint8Array }> = (props) => {
+	const room = useRoom();
+	const [ping, { refetch }] = createResource(() => room.ping(props.peerId));
+
+	return (
+		<Card.Root p="4" gap="2">
+			<Table.Root size="sm">
+				<Table.Body>
+					<Table.Row>
+						<Table.Header>Peer ID</Table.Header>
+						<Table.Cell>{props.peerId}</Table.Cell>
+					</Table.Row>
+					<Table.Row>
+						<Table.Header>Public Key</Table.Header>
+						<Table.Cell>
+							<KeyDisplay value={props.key} />
+						</Table.Cell>
+					</Table.Row>
+					<Table.Row>
+						<Table.Header>Ping</Table.Header>
+						<Table.Cell>
+							<HStack>
+								<Suspense fallback="...">{ping()}ms</Suspense>
+								<IconButton size="xs" onClick={refetch}>
+									<TablerRefresh />
+								</IconButton>
+							</HStack>
+						</Table.Cell>
+					</Table.Row>
+				</Table.Body>
+			</Table.Root>
+		</Card.Root>
+	);
+};
+
 function PeerGrid() {
-	return <Grid>TODO</Grid>;
+	const blockchain = useBlockchain();
+	const peers = blockchain.store.peers;
+	return (
+		<Grid columns={{ base: 1, md: 2, xl: 3 }}>
+			<For each={Object.entries(peers)}>
+				{([peerId, data]) => <PeerCard peerId={peerId} key={data} />}
+			</For>
+		</Grid>
+	);
 }
 
 export default function NetworkPage() {
@@ -62,6 +100,7 @@ export default function NetworkPage() {
 				Peers
 			</Heading>
 			<PeerGrid />
+			<br />
 		</Stack>
 	);
 }

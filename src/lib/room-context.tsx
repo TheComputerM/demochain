@@ -15,6 +15,7 @@ export enum NetworkEvent {
 	STATE = "net_state",
 	TRANSACTION = "sngl_tsx",
 	BLOCK = "sngl_blk",
+	WALLET = "sngl_wlt",
 }
 
 export const TrysteroConfig = {
@@ -31,7 +32,7 @@ export const RoomProvider: ParentComponent = (props) => {
 
 	const room = joinRoom(TrysteroConfig, networkId);
 
-	logger.info(`Joined network as ${selfId}`);
+	logger.info(`Joined network ${networkId} as ${selfId}`);
 
 	onMount(() => {
 		room.onPeerJoin((peer) => {

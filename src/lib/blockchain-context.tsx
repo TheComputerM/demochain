@@ -1,4 +1,5 @@
-import { decode } from "cbor2";
+import { makeEventListener } from "@solid-primitives/event-listener";
+import { decode, encode } from "cbor2";
 import {
 	type ParentComponent,
 	createContext,
@@ -19,11 +20,21 @@ export const BlockchainProvider: ParentComponent = (props) => {
 	const room = useRoom();
 	const wallet = useWallet();
 	const blockchain = new Blockchain({
+		peers: {},
 		blocks: [],
 		settings: {
 			difficulty: 1,
 		},
 		mempool: [],
+	});
+
+	const [sendWallet, recieveWallet] = room.makeAction<Uint8Array>(
+		NetworkEvent.WALLET,
+	);
+
+	recieveWallet((payload, peerId) => {
+		const publicKey = decode<Uint8Array>(payload);
+		blockchain.setStore("peers", peerId, publicKey);
 	});
 
 	onMount(async () => {
@@ -33,17 +44,37 @@ export const BlockchainProvider: ParentComponent = (props) => {
 		) {
 			blockchain.createGenesisBlock(wallet.raw.public);
 		}
+
+		makeEventListener<{ "peer-join": CustomEvent<string> }>(
+			window,
+			"peer-join",
+			(event) => {
+				// send our wallet to the new peer
+				sendWallet(encode(wallet.raw.public), event.detail);
+			},
+		);
+
+		makeEventListener<{ "peer-leave": CustomEvent<string> }>(
+			window,
+			"peer-leave",
+			(event) => {
+				// remove peer from blockchain
+				blockchain.setStore("peers", event.detail, undefined!);
+			},
+		);
 	});
 
-	const recieveTransaction = room.makeAction(NetworkEvent.TRANSACTION)[1];
+	const recieveTransaction = room.makeAction<Uint8Array>(
+		NetworkEvent.TRANSACTION,
+	)[1];
 	recieveTransaction((data) => {
-		const transaction = decode<Transaction>(data as Uint8Array);
+		const transaction = decode<Transaction>(data);
 		blockchain.addTransaction(transaction);
 	});
 
-	const recieveBlock = room.makeAction(NetworkEvent.BLOCK)[1];
+	const recieveBlock = room.makeAction<Uint8Array>(NetworkEvent.BLOCK)[1];
 	recieveBlock((data) => {
-		const block = decode<Block>(data as Uint8Array);
+		const block = decode<Block>(data);
 		logger.info(`Received block ${block.hash}`);
 		blockchain.appendBlock(block);
 	});

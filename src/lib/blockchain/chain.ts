@@ -10,6 +10,7 @@ export interface BlockchainSettings {
 }
 
 export interface BlockchainState {
+	peers: Record<string, Uint8Array>;
 	blocks: Block[];
 	settings: BlockchainSettings;
 	mempool: Transaction[];
