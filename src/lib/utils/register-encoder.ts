@@ -17,7 +17,7 @@ Tag.registerDecoder(
 // Serialization for Block class
 registerEncoder(Block, (b, _writer, _options) => [
 	64001,
-	[b.index, b.timestamp, b.hash, b.previousHash, b.nonce, b.transactions],
+	[b.index, b.timestamp, b.hash, b.previousHash, b.nonce, b.minedBy, b.transactions],
 ]);
 Tag.registerDecoder(
 	64001,

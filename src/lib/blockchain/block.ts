@@ -1,3 +1,4 @@
+import { encode } from "cbor2";
 import { logger } from "../logger";
 import type { Transaction } from "./transaction";
 
@@ -7,6 +8,7 @@ export class Block {
 	hash: string;
 	previousHash: string;
 	nonce: number;
+	minedBy: Uint8Array;
 	transactions: Transaction[];
 
 	constructor(
@@ -15,6 +17,7 @@ export class Block {
 		hash: string,
 		previousHash: string,
 		nonce: number,
+		minedBy: Uint8Array,
 		transactions: Transaction[],
 	) {
 		this.index = index;
@@ -22,12 +25,12 @@ export class Block {
 		this.hash = hash;
 		this.previousHash = previousHash;
 		this.nonce = nonce;
+		this.minedBy = minedBy;
 		this.transactions = transactions;
 	}
 
 	async calculateHash() {
-		const data = `${this.index}${this.timestamp}${this.previousHash}${this.nonce}${this.transactions}`;
-		const buffer = new TextEncoder().encode(data);
+		const buffer = encode(this);
 		const hashBuffer = await crypto.subtle.digest("SHA-256", buffer);
 		const hashArray = Array.from(new Uint8Array(hashBuffer));
 		const hash = hashArray

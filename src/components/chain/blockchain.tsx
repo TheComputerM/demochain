@@ -15,25 +15,30 @@ export const BlockDisplay: Component<{ block: Block }> = (props) => {
 			</Card.Header>
 			<Card.Body>
 				<Table.Root size="sm">
-					<Table.Head>
-						<Table.Header colSpan={2}>Properties</Table.Header>
-					</Table.Head>
 					<Table.Body>
 						<Table.Row>
-							<Table.Cell>Nonce</Table.Cell>
+							<Table.Header>Nonce</Table.Header>
 							<Table.Cell>{props.block.nonce}</Table.Cell>
 						</Table.Row>
 						<Table.Row>
-							<Table.Cell>Timestamp</Table.Cell>
+							<Table.Header>Timestamp</Table.Header>
 							<Table.Cell>{props.block.timestamp}</Table.Cell>
 						</Table.Row>
 						<Table.Row>
-							<Table.Cell>Previous Hash</Table.Cell>
+							<Table.Header>Previous Hash</Table.Header>
 							<Table.Cell>{props.block.previousHash}</Table.Cell>
+						</Table.Row>
+						<Table.Row>
+							<Table.Header>
+								Mined by
+							</Table.Header>
+							<Table.Cell>
+								<KeyDisplay value={props.block.minedBy} />
+							</Table.Cell>
 						</Table.Row>
 					</Table.Body>
 				</Table.Root>
-				<Divider borderColor="border.default" />
+				<Divider borderColor="border.default" my="1" />
 				<Table.Root size="sm">
 					<Table.Head>
 						<Table.Header>From</Table.Header>
