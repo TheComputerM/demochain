@@ -12,6 +12,7 @@ import type { Transaction } from "~/lib/blockchain/transaction";
 import { logger } from "~/lib/logger";
 import { NetworkEvent, TrysteroConfig, useRoom } from "~/lib/room-context";
 import type { Block } from "./blockchain/block";
+import { Wallet } from "./blockchain/wallet";
 import { useWallet } from "./wallet-context";
 
 const BlockchainContext = createContext<Blockchain>();
@@ -20,7 +21,7 @@ export const BlockchainProvider: ParentComponent = (props) => {
 	const room = useRoom();
 	const wallet = useWallet();
 	const blockchain = new Blockchain({
-		peers: {},
+		wallets: {},
 		blocks: [],
 		settings: {
 			difficulty: 1,
@@ -32,9 +33,10 @@ export const BlockchainProvider: ParentComponent = (props) => {
 		NetworkEvent.WALLET,
 	);
 
-	recieveWallet((payload, peerId) => {
+	recieveWallet(async (payload, peerId) => {
 		const publicKey = decode<Uint8Array>(payload);
-		blockchain.setStore("peers", peerId, publicKey);
+		const wallet = await Wallet.fromPublickey(publicKey);
+		blockchain.setStore("wallets", peerId, wallet);
 	});
 
 	onMount(async () => {
@@ -59,7 +61,7 @@ export const BlockchainProvider: ParentComponent = (props) => {
 			"peer-leave",
 			(event) => {
 				// remove peer from blockchain
-				blockchain.setStore("peers", event.detail, undefined!);
+				blockchain.setStore("wallets", event.detail, null!);
 			},
 		);
 	});
@@ -67,9 +69,17 @@ export const BlockchainProvider: ParentComponent = (props) => {
 	const recieveTransaction = room.makeAction<Uint8Array>(
 		NetworkEvent.TRANSACTION,
 	)[1];
-	recieveTransaction((data) => {
-		const transaction = decode<Transaction>(data);
-		blockchain.addTransaction(transaction);
+
+	recieveTransaction(async (data, peerId) => {
+		const [payload, signature] = decode<[Uint8Array, Uint8Array]>(data);
+		const senderWallet = blockchain.store.wallets[peerId];
+		const valid = senderWallet.verify(payload, signature);
+		if (!valid) {
+			logger.error("Invalid transaction signature");
+			return;
+		}
+		logger.info(`Received transaction from ${peerId}`);
+		blockchain.addTransaction(decode<Transaction>(payload));
 	});
 
 	const recieveBlock = room.makeAction<Uint8Array>(NetworkEvent.BLOCK)[1];

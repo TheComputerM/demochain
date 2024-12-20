@@ -1,5 +1,6 @@
 import { Grid, Stack } from "styled-system/jsx";
 import { Balance } from "~/components/chain/balance";
+import { BroadcastTransaction } from "~/components/chain/broadcast-transaction";
 import { CreateTransaction } from "~/components/chain/create-transaction";
 import { KeyDisplay } from "~/components/chain/key-display";
 import { Heading } from "~/components/ui/heading";
@@ -39,8 +40,9 @@ export default function WalletPage() {
 					</Table.Row>
 				</Table.Body>
 			</Table.Root>
-			<Grid columns={2}>
+			<Grid columns={{ base: 1, lg: 2 }} alignItems="self-start">
 				<CreateTransaction />
+				<BroadcastTransaction />
 			</Grid>
 		</Stack>
 	);

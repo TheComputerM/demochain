@@ -1,112 +1,9 @@
-import { Store, useStore } from "@tanstack/solid-store";
-import { encode } from "cbor2";
-import { type Component, For, Show, createEffect } from "solid-js";
-import { HStack, Stack } from "styled-system/jsx";
-import { Button } from "~/components/ui/button";
-import { Card } from "~/components/ui/card";
+import type { Component } from "solid-js";
+import { Stack } from "styled-system/jsx";
 import { Heading } from "~/components/ui/heading";
-import { useBlockchain } from "~/lib/blockchain-context";
-import { Block } from "~/lib/blockchain/block";
-import type { Transaction } from "~/lib/blockchain/transaction";
-import { logger } from "~/lib/logger";
-import { NetworkEvent, useRoom } from "~/lib/room-context";
-import TablerArrowNarrowRight from "~icons/tabler/arrow-narrow-right";
-
-const selectedTransactionsStore = new Store<boolean[]>([]);
-
-const TransactionDisplay: Component<{
-	transaction: Transaction;
-	index: number;
-}> = (props) => {
-	const isSelected = useStore(
-		selectedTransactionsStore,
-		(state) => state[props.index],
-	);
-
-	const toggleSelected = () =>
-		selectedTransactionsStore.setState((state) => {
-			state[props.index] = !state[props.index];
-			return state;
-		});
-
-	return (
-		<Card.Root>
-			<Card.Header>
-				<HStack justify="space-between">
-					<Stack>
-						<Card.Title display="flex" alignItems="center" gap="2">
-							{props.transaction.sender}
-							<TablerArrowNarrowRight />
-							{props.transaction.recipient}
-						</Card.Title>
-						<Card.Description>{props.transaction.amount}</Card.Description>
-					</Stack>
-					<Button
-						variant={isSelected() ? "outline" : "solid"}
-						onClick={toggleSelected}
-					>
-						<Show when={isSelected()} fallback="Add to Block">
-							Remove
-						</Show>
-					</Button>
-				</HStack>
-			</Card.Header>
-		</Card.Root>
-	);
-};
 
 const MempoolDisplay: Component = () => {
-	const mempool = useBlockchain().store.mempool;
-
-	createEffect(() => {
-		selectedTransactionsStore.setState(() =>
-			new Array(mempool.length).fill(false),
-		);
-	});
-
-	return (
-		<Stack>
-			<For each={mempool}>
-				{(transaction, i) => (
-					<TransactionDisplay transaction={transaction} index={i()} />
-				)}
-			</For>
-		</Stack>
-	);
-};
-
-const MineTransactions: Component = () => {
-	const selectedTransactions = useStore(selectedTransactionsStore);
-	const blockchain = useBlockchain();
-	const room = useRoom();
-	const broadcastBlock = room.makeAction(NetworkEvent.BLOCK)[0];
-
-	/**
-	 * Create a block from the selected transactions
-	 */
-	async function mineBlock() {
-		const block = new Block(
-			blockchain.store.blocks.length,
-			Date.now(),
-			"",
-			blockchain.store.blocks.at(-1)!.hash,
-			0,
-			blockchain.store.mempool.filter((_, i) => selectedTransactions()[i]),
-		);
-		await block.mine(blockchain.store.settings.difficulty);
-		blockchain.appendBlock(block);
-		logger.info(`Broadcasted block ${block.hash} at ${(new Date()).getTime()}`);
-		await broadcastBlock(encode(block));
-	}
-
-	return (
-		<Button
-			disabled={!selectedTransactions().find((x) => x)}
-			onClick={mineBlock}
-		>
-			Mine Selected Transactions
-		</Button>
-	);
+	return <Stack>TODO</Stack>;
 };
 
 export default function MempoolPage() {
@@ -116,7 +13,6 @@ export default function MempoolPage() {
 				Mempool
 			</Heading>
 			<MempoolDisplay />
-			<MineTransactions />
 		</Stack>
 	);
 }

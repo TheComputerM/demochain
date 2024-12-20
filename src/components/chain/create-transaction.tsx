@@ -39,9 +39,13 @@ export const CreateTransaction = () => {
 	};
 
 	return (
-		<Card.Root>
+		<Card.Root height="min-content">
 			<Card.Header>
 				<Card.Title>Create Transaction</Card.Title>
+				<Card.Description>
+					This does not broadcast the transaction to the network, it just adds
+					it to your mempool.
+				</Card.Description>
 			</Card.Header>
 			<Form style={{ display: "contents" }} onSubmit={handleSubmit}>
 				<Card.Body gap="3">

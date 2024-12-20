@@ -4,13 +4,14 @@ import { areUint8ArraysEqual, hexToUint8Array } from "uint8array-extras";
 import { logger } from "../logger";
 import { Block } from "./block";
 import { Transaction } from "./transaction";
+import type { Wallet } from "./wallet";
 
 export interface BlockchainSettings {
 	difficulty: number;
 }
 
 export interface BlockchainState {
-	peers: Record<string, Uint8Array>;
+	wallets: Record<string, Wallet>;
 	blocks: Block[];
 	settings: BlockchainSettings;
 	mempool: Transaction[];

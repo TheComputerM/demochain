@@ -49,6 +49,6 @@ export class Block {
 			this.hash = await this.calculateHash();
 		}
 		const endTime = new Date().getTime();
-		logger.info(`Mined block ${this.hash} in ${endTime - startTime}ms`);
+		logger.log(`Mined block ${this.hash} in ${endTime - startTime}ms`);
 	}
 }
