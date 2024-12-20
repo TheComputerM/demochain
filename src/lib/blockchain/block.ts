@@ -1,4 +1,5 @@
 import { encode } from "cbor2";
+import { subtle } from "uncrypto";
 import { logger } from "../logger";
 import type { Transaction } from "./transaction";
 
@@ -31,7 +32,7 @@ export class Block {
 
 	async calculateHash() {
 		const buffer = encode(this);
-		const hashBuffer = await crypto.subtle.digest("SHA-256", buffer);
+		const hashBuffer = await subtle.digest("SHA-256", buffer);
 		const hashArray = Array.from(new Uint8Array(hashBuffer));
 		const hash = hashArray
 			.map((byte) => byte.toString(16).padStart(2, "0"))

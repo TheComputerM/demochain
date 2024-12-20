@@ -1,8 +1,7 @@
 import { type Component, For } from "solid-js";
-import { Divider, Stack } from "styled-system/jsx";
+import { Divider } from "styled-system/jsx";
 import { Card } from "~/components/ui/card";
 import { Table } from "~/components/ui/table";
-import { useBlockchain } from "~/lib/blockchain-context";
 import type { Block } from "~/lib/blockchain/block";
 import { KeyDisplay } from "./key-display";
 
@@ -29,9 +28,7 @@ export const BlockDisplay: Component<{ block: Block }> = (props) => {
 							<Table.Cell>{props.block.previousHash}</Table.Cell>
 						</Table.Row>
 						<Table.Row>
-							<Table.Header>
-								Mined by
-							</Table.Header>
+							<Table.Header>Mined by</Table.Header>
 							<Table.Cell>
 								<KeyDisplay value={props.block.minedBy} />
 							</Table.Cell>
@@ -63,15 +60,5 @@ export const BlockDisplay: Component<{ block: Block }> = (props) => {
 				</Table.Root>
 			</Card.Body>
 		</Card.Root>
-	);
-};
-
-export const BlockchainDisplay: Component = () => {
-	const blockchain = useBlockchain();
-	const blocks = blockchain.store.blocks;
-	return (
-		<Stack>
-			<For each={blocks}>{(block) => <BlockDisplay block={block} />}</For>
-		</Stack>
 	);
 };
