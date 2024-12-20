@@ -2,7 +2,6 @@ import { Stack } from "styled-system/jsx";
 import { KeyDisplay } from "~/components/chain/key-display";
 import { Heading } from "~/components/ui/heading";
 import { Table } from "~/components/ui/table";
-import { TransactionForm } from "~/components/wallet/transaction";
 import { useBlockchain } from "~/lib/blockchain-context";
 import { useWallet } from "~/lib/wallet-context";
 
@@ -36,7 +35,6 @@ export default function WalletPage() {
 					</Table.Row>
 				</Table.Body>
 			</Table.Root>
-			<TransactionForm />
 		</Stack>
 	);
 }
