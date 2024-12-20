@@ -1,9 +1,9 @@
 import { batch } from "solid-js";
 import { type SetStoreFunction, createStore, reconcile } from "solid-js/store";
+import { areUint8ArraysEqual, hexToUint8Array } from "uint8array-extras";
 import { logger } from "../logger";
 import { Block } from "./block";
 import { Transaction } from "./transaction";
-import { Wallet } from "./wallet";
 
 export interface BlockchainSettings {
 	difficulty: number;
@@ -33,7 +33,7 @@ export class Blockchain {
 
 		const block = new Block(0, Date.now(), "", "", 0, [
 			new Transaction(
-				Wallet.HexToUint8Array(
+				hexToUint8Array(
 					// pssst, there is a secret message here
 					"6d6f6e65792067726f7773206f6e20746865206d65726b6c652074726565b42a552a010675e0ee6b612e74c73f0af04009ab295772092822b541ac1d34b2a5e0fa",
 				),
@@ -121,9 +121,9 @@ export class Blockchain {
 		return this.store.blocks
 			.flatMap((block) => block.transactions)
 			.reduce((acc, transaction) => {
-				if (Wallet.compareKeys(transaction.sender, address))
+				if (areUint8ArraysEqual(transaction.sender, address))
 					return acc - transaction.amount;
-				if (Wallet.compareKeys(transaction.recipient, address))
+				if (areUint8ArraysEqual(transaction.recipient, address))
 					return acc + transaction.amount;
 				return acc;
 			}, 0);

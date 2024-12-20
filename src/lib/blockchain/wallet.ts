@@ -45,22 +45,4 @@ export class Wallet {
 	static async exportBuffer(key: CryptoKey) {
 		return subtle.exportKey(key.type === "public" ? "raw" : "pkcs8", key);
 	}
-
-	static Uint8ArrayToHex(array: Uint8Array) {
-		return [...array].map((x) => x.toString(16).padStart(2, "0")).join("");
-	}
-
-	static HexToUint8Array(hex: string) {
-		return new Uint8Array(
-			hex.match(/.{1,2}/g)!.map((byte) => Number.parseInt(byte, 16)),
-		);
-	}
-
-	static compareKeys(a: Uint8Array, b: Uint8Array) {
-		if (a.length !== b.length) {
-			return false;
-		}
-
-		return a.every((value, index) => value === b[index]);
-	}
 }
