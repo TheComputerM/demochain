@@ -1,8 +1,8 @@
 import { encode } from "cbor2";
+import { uint8ArrayToHex } from "uint8array-extras";
 import { subtle } from "uncrypto";
 import { logger } from "../logger";
 import type { Transaction } from "./transaction";
-import { uint8ArrayToHex } from "uint8array-extras";
 
 export class Block {
 	index: number;

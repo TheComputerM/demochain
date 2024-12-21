@@ -1,3 +1,4 @@
+import { ReactiveMap } from "@solid-primitives/map";
 import { batch } from "solid-js";
 import { type SetStoreFunction, createStore, reconcile } from "solid-js/store";
 import { areUint8ArraysEqual, hexToUint8Array } from "uint8array-extras";
@@ -5,7 +6,6 @@ import { logger } from "../logger";
 import { Block } from "./block";
 import { Transaction } from "./transaction";
 import type { Wallet } from "./wallet";
-import { ReactiveMap } from "@solid-primitives/map";
 
 export interface BlockchainSettings {
 	difficulty: number;
