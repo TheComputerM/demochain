@@ -9,6 +9,7 @@ import { ReactiveMap } from "@solid-primitives/map";
 
 export interface BlockchainSettings {
 	difficulty: number;
+	baseReward: number;
 }
 
 export interface BlockchainState {
@@ -24,7 +25,7 @@ export class Blockchain {
 
 	constructor(initial: BlockchainState) {
 		[this.store, this.setStore] = createStore(initial);
-		this.wallets = new ReactiveMap()
+		this.wallets = new ReactiveMap();
 	}
 
 	/**
@@ -120,7 +121,14 @@ export class Blockchain {
 	 * Returns the balance of a given address.
 	 */
 	getBalance(address: Uint8Array) {
-		return this.store.blocks
+		const fromMining =
+			this.store.blocks.reduce(
+				(acc, block) =>
+					areUint8ArraysEqual(block.minedBy, address) ? acc + 1 : acc,
+				0,
+			) * this.store.settings.baseReward;
+
+		const fromTransactions = this.store.blocks
 			.flatMap((block) => block.transactions)
 			.reduce((acc, transaction) => {
 				if (areUint8ArraysEqual(transaction.sender, address))
@@ -129,5 +137,6 @@ export class Blockchain {
 					return acc + transaction.amount;
 				return acc;
 			}, 0);
+		return fromTransactions + fromMining;
 	}
 }

@@ -24,6 +24,7 @@ export const BlockchainProvider: ParentComponent = (props) => {
 		blocks: [],
 		settings: {
 			difficulty: 1,
+			baseReward: 5,
 		},
 		mempool: [],
 	});
@@ -84,7 +85,7 @@ export const BlockchainProvider: ParentComponent = (props) => {
 	const recieveBlock = room.makeAction<Uint8Array>(NetworkEvent.BLOCK)[1];
 	recieveBlock((data, peerId) => {
 		const block = decode<Block>(data);
-		
+
 		logger.info(`received block ${block.hash} from peer:${peerId}`);
 		blockchain.appendBlock(block);
 	});
