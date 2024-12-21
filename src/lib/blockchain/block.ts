@@ -34,8 +34,36 @@ export class Block {
 		this.transactions = transactions;
 	}
 
+	static async create(props: {
+		index: number;
+		previousHash: Uint8Array;
+		wallet: Wallet;
+		transactions: Transaction[];
+	}) {
+		const block = new Block(
+			props.index,
+			Date.now(),
+			new Uint8Array([]),
+			props.previousHash,
+			0,
+			props.wallet.raw.public,
+			props.transactions,
+		);
+
+		block.hash = await block.calculateHash();
+		return block;
+	}
+
 	async calculateHash() {
-		const buffer = encode(this);
+		// calculate hash using every property except the hash itself
+		const buffer = encode([
+			this.index,
+			this.timestamp,
+			this.previousHash,
+			this.nonce,
+			this.minedBy,
+			this.transactions,
+		]);
 		const hashBuffer = await subtle.digest("SHA-256", buffer);
 		const hash = new Uint8Array(hashBuffer);
 		return hash;
@@ -64,25 +92,5 @@ export class Block {
 	async sign(wallet: Wallet) {
 		const buffer = encode(this);
 		this.signature = await wallet.sign(buffer);
-	}
-
-	static async create(props: {
-		index: number;
-		previousHash: Uint8Array;
-		wallet: Wallet;
-		transactions: Transaction[];
-	}) {
-		const block = new Block(
-			props.index,
-			Date.now(),
-			new Uint8Array([]),
-			props.previousHash,
-			0,
-			props.wallet.raw.public,
-			props.transactions,
-		);
-
-		block.hash = await block.calculateHash();
-		return block;
 	}
 }
