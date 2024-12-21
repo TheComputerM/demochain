@@ -7,6 +7,7 @@ import {
 	useContext,
 } from "solid-js";
 import { getOccupants } from "trystero/firebase";
+import { uint8ArrayToHex } from "uint8array-extras";
 import { Blockchain } from "~/lib/blockchain/chain";
 import type { Transaction } from "~/lib/blockchain/transaction";
 import { logger } from "~/lib/logger";
@@ -14,7 +15,6 @@ import { NetworkEvent, TrysteroConfig, useRoom } from "~/lib/room-context";
 import type { Block } from "./blockchain/block";
 import { Wallet } from "./blockchain/wallet";
 import { useWallet } from "./wallet-context";
-import { uint8ArrayToHex } from "uint8array-extras";
 
 const BlockchainContext = createContext<Blockchain>();
 
