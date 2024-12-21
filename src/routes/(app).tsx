@@ -29,8 +29,8 @@ export default function AppLayout(props: RouteSectionProps) {
 	const routes = [
 		{ icon: TablerWallet, id: "wallet", label: "Wallet" },
 		{ icon: TablerTopologyFull, id: "network", label: "Network" },
-		{ icon: TablerChartDots3Filled, id: "blockchain", label: "Blockchain" },
 		{ icon: TablerPick, id: "mempool", label: "Mempool" },
+		{ icon: TablerChartDots3Filled, id: "blockchain", label: "Blockchain" },
 		{ icon: TablerTerminal2, id: "console", label: "Console" },
 	];
 	return (
