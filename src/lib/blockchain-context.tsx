@@ -14,6 +14,7 @@ import { NetworkEvent, TrysteroConfig, useRoom } from "~/lib/room-context";
 import type { Block } from "./blockchain/block";
 import { Wallet } from "./blockchain/wallet";
 import { useWallet } from "./wallet-context";
+import { uint8ArrayToHex } from "uint8array-extras";
 
 const BlockchainContext = createContext<Blockchain>();
 
@@ -75,7 +76,7 @@ export const BlockchainProvider: ParentComponent = (props) => {
 		const senderWallet = blockchain.wallets.get(peerId);
 		if (!senderWallet) throw new Error("Sender wallet not found");
 
-		const valid = senderWallet.verify(payload, signature);
+		const valid = await senderWallet.verify(payload, signature);
 		if (!valid) throw new Error("Invalid signature");
 
 		const transaction = decode<Transaction>(payload);
@@ -85,11 +86,20 @@ export const BlockchainProvider: ParentComponent = (props) => {
 	});
 
 	const recieveBlock = room.makeAction<Uint8Array>(NetworkEvent.BLOCK)[1];
-	recieveBlock((data, peerId) => {
-		const block = decode<Block>(data);
+	recieveBlock(async (data, peerId) => {
+		const [payload, signature] = decode<[Uint8Array, Uint8Array]>(data);
+		const senderWallet = blockchain.wallets.get(peerId);
+		if (!senderWallet) throw new Error("Sender wallet not found");
 
-		logger.info(`received block ${block.hash} from peer:${peerId}`);
+		const valid = senderWallet.verify(payload, signature);
+		if (!valid) throw new Error("Invalid signature");
+
+		const block = decode<Block>(payload);
+		block.signature = signature;
 		blockchain.appendBlock(block);
+		logger.info(
+			`received block:${uint8ArrayToHex(block.hash.slice(0, 6))} from peer:${peerId}`,
+		);
 	});
 
 	return (

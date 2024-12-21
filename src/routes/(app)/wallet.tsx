@@ -29,7 +29,7 @@ export default function WalletPage() {
 					<Table.Row>
 						<Table.Header>Private Key</Table.Header>
 						<Table.Cell overflow="hidden" textOverflow="ellipsis" maxWidth="0">
-							<KeyDisplay value={wallet.raw.private} />
+							<KeyDisplay value={wallet.raw.private!} />
 						</Table.Cell>
 					</Table.Row>
 					<Table.Row>
