@@ -44,7 +44,7 @@ export const BlockchainProvider: ParentComponent = (props) => {
 			(await getOccupants(TrysteroConfig, sessionStorage.getItem("network")!))
 				.length === 0
 		) {
-			blockchain.createGenesisBlock(wallet.raw.public);
+			blockchain.createGenesisBlock(wallet);
 		}
 
 		makeEventListener<{ "peer-join": CustomEvent<string> }>(
