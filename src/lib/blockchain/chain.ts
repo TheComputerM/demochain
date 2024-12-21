@@ -49,7 +49,7 @@ export class Blockchain {
 		const block = await Block.create({
 			index: 0,
 			previousHash: new Uint8Array([]),
-			wallet,
+			minedBy: wallet.raw.public,
 			transactions: [transaction],
 		});
 		await block.mine(this.store.settings.difficulty);
@@ -70,7 +70,7 @@ export class Blockchain {
 		if (!areUint8ArraysEqual(block.previousHash, previousBlock.hash)) {
 			throw new Error("Invalid previousHash");
 		}
-		if (block.hash !== (await block.calculateHash())) {
+		if (!areUint8ArraysEqual(block.hash, await block.calculateHash())) {
 			throw new Error("Invalid block hash");
 		}
 		if (!block.satisfiesDifficulty(this.store.settings.difficulty)) {

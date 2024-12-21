@@ -34,20 +34,20 @@ export class Block {
 		this.transactions = transactions;
 	}
 
-	static async create(props: {
+	static async create(input: {
 		index: number;
 		previousHash: Uint8Array;
-		wallet: Wallet;
+		minedBy: Uint8Array;
 		transactions: Transaction[];
 	}) {
 		const block = new Block(
-			props.index,
+			input.index,
 			Date.now(),
 			new Uint8Array([]),
-			props.previousHash,
+			input.previousHash,
 			0,
-			props.wallet.raw.public,
-			props.transactions,
+			input.minedBy,
+			input.transactions,
 		);
 
 		block.hash = await block.calculateHash();

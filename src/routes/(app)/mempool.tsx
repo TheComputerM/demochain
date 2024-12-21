@@ -8,9 +8,13 @@ import { Checkbox } from "~/components/ui/checkbox";
 import { Heading } from "~/components/ui/heading";
 import { Text } from "~/components/ui/text";
 import { useBlockchain } from "~/lib/blockchain-context";
+import { Block } from "~/lib/blockchain/block";
+import { useWallet } from "~/lib/wallet-context";
 
 const MempoolDisplay: Component = () => {
-	const mempool = useBlockchain().store.mempool;
+	const blockchain = useBlockchain();
+	const wallet = useWallet();
+	const mempool = blockchain.store.mempool;
 	const [store, setStore] = createStore<{ selected: boolean[] }>({
 		selected: [],
 	});
@@ -21,6 +25,19 @@ const MempoolDisplay: Component = () => {
 	createEffect(() => {
 		setStore("selected", new Array(mempool.length).fill(false));
 	});
+
+	async function mineBlock() {
+		const transactions = mempool.filter((_, i) => store.selected[i]);
+		const block = await Block.create({
+			index: blockchain.store.blocks.length,
+			previousHash: blockchain.store.blocks.at(-1)!.hash,
+			transactions,
+			minedBy: wallet.raw.public,
+		})
+		await block.mine(blockchain.store.settings.difficulty);
+		await block.sign(wallet);
+		blockchain.appendBlock(block);
+	}
 
 	return (
 		<Stack>
@@ -39,7 +56,7 @@ const MempoolDisplay: Component = () => {
 					</Card.Root>
 				)}
 			</For>
-			<Button width="full" disabled={selectedCount() === 0}>
+			<Button width="full" disabled={selectedCount() === 0} onClick={mineBlock}>
 				Mine Block with {selectedCount()} Transactions
 			</Button>
 		</Stack>
