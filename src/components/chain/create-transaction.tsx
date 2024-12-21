@@ -29,13 +29,17 @@ export const CreateTransaction = () => {
 		},
 	});
 
-	const handleSubmit: SubmitHandler<TransactionForm> = async (values, event) => {
+	const handleSubmit: SubmitHandler<TransactionForm> = async (
+		values,
+		event,
+	) => {
 		const reciever = hexToUint8Array(values.wallet);
 		const transaction = await Transaction.create({
 			sender: wallet.raw.public,
 			recipient: reciever,
 			amount: values.amount,
 		});
+		await transaction.sign(wallet);
 		blockchain.addTransaction(transaction);
 		reset(form);
 	};

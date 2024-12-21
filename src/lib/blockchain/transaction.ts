@@ -1,5 +1,6 @@
 import { encode } from "cbor2";
 import { subtle } from "uncrypto";
+import type { Wallet } from "./wallet";
 
 export class Transaction {
 	hash: Uint8Array;
@@ -7,6 +8,8 @@ export class Transaction {
 	recipient: Uint8Array;
 	amount: number;
 	timestamp: number;
+
+	signature?: Uint8Array;
 
 	constructor(
 		hash: Uint8Array,
@@ -48,5 +51,10 @@ export class Transaction {
 		const hashBuffer = await subtle.digest("SHA-256", buffer);
 		const hash = new Uint8Array(hashBuffer);
 		return hash;
+	}
+
+	async sign(wallet: Wallet) {
+		const buffer = encode(this);
+		this.signature = await wallet.sign(buffer);
 	}
 }

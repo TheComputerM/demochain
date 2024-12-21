@@ -13,12 +13,11 @@ import { TransactionDisplay } from "./transaction-display";
 
 const TransactionEntry: Component<{ transaction: Transaction }> = (props) => {
 	const room = useRoom();
-	const wallet = useWallet();
 	const broadcastTransaction = room.makeAction(NetworkEvent.TRANSACTION)[0];
 
 	const broadcast = async () => {
 		const data = encode(props.transaction);
-		const signature = await wallet.sign(data);
+		const signature = props.transaction.signature;
 		await broadcastTransaction(encode([data, signature]));
 	};
 

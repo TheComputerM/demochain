@@ -1,35 +1,15 @@
-import { Clipboard } from "@ark-ui/solid";
 import { encode } from "cbor2";
-import { type Component, For, type ParentComponent } from "solid-js";
+import { type Component, For } from "solid-js";
 import { Divider, Grid, HStack } from "styled-system/jsx";
 import { uint8ArrayToHex } from "uint8array-extras";
 import { Card } from "~/components/ui/card";
 import { Table } from "~/components/ui/table";
 import type { Block } from "~/lib/blockchain/block";
-import TablerCopy from "~icons/tabler/copy";
-import TablerCopyCheck from "~icons/tabler/copy-check";
 import TablerExternalLink from "~icons/tabler/external-link";
 import { Badge } from "../ui/badge";
-import { Button } from "../ui/button";
+import { CopyButton } from "../ui/copy-button";
 import { KeyDisplay } from "./key-display";
 import { TransactionDisplay } from "./transaction-display";
-
-const CopyButton: ParentComponent<{ value: string }> = (props) => {
-	return (
-		<Clipboard.Root value={props.value}>
-			<Clipboard.Trigger
-				asChild={(forwardProps) => (
-					<Button {...forwardProps()} size="xs">
-						{props.children}
-						<Clipboard.Indicator copied={<TablerCopyCheck />}>
-							<TablerCopy />
-						</Clipboard.Indicator>
-					</Button>
-				)}
-			/>
-		</Clipboard.Root>
-	);
-};
 
 export const BlockDisplay: Component<{ block: Block }> = (props) => {
 	const blockData = encode(props.block);
@@ -74,9 +54,9 @@ export const BlockDisplay: Component<{ block: Block }> = (props) => {
 			</Card.Body>
 			<Card.Footer justifyContent="space-between" alignItems="center">
 				<HStack>
-					<CopyButton value={hexBlockData}>Data (Hex)</CopyButton>
+					<CopyButton value={hexBlockData}>Data</CopyButton>
 					<CopyButton value={uint8ArrayToHex(props.block.signature!)}>
-						Signature (Hex)
+						Signature
 					</CopyButton>
 				</HStack>
 				<HStack>

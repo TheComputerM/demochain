@@ -78,8 +78,10 @@ export const BlockchainProvider: ParentComponent = (props) => {
 		const valid = senderWallet.verify(payload, signature);
 		if (!valid) throw new Error("Invalid signature");
 
+		const transaction = decode<Transaction>(payload);
+		transaction.signature = signature;
 		logger.info(`received transaction from peer:${peerId}`);
-		blockchain.addTransaction(decode<Transaction>(payload));
+		blockchain.addTransaction(transaction);
 	});
 
 	const recieveBlock = room.makeAction<Uint8Array>(NetworkEvent.BLOCK)[1];

@@ -44,6 +44,7 @@ export class Blockchain {
 			recipient: wallet.raw.public,
 			amount: 1000,
 		});
+		await transaction.sign(wallet);
 
 		const block = await Block.create({
 			index: 0,
