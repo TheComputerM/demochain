@@ -1,7 +1,11 @@
 import { ReactiveMap } from "@solid-primitives/map";
 import { batch } from "solid-js";
 import { type SetStoreFunction, createStore, reconcile } from "solid-js/store";
-import { areUint8ArraysEqual, hexToUint8Array } from "uint8array-extras";
+import {
+	areUint8ArraysEqual,
+	hexToUint8Array,
+	uint8ArrayToHex,
+} from "uint8array-extras";
 import { logger } from "../logger";
 import { Block } from "./block";
 import { Transaction } from "./transaction";
@@ -56,6 +60,7 @@ export class Blockchain {
 		await block.sign(wallet);
 
 		this.setStore("blocks", 0, block);
+		logger.debug("created genesis block");
 	}
 
 	/**
@@ -97,13 +102,25 @@ export class Blockchain {
 				),
 			);
 		});
+
+		logger.success(`added block:${uint8ArrayToHex(block.hash.slice(0, 6))}... to chain`);
 	}
 
 	/**
 	 * adds a transaction to the node's mempool.
 	 */
 	addTransaction(transaction: Transaction) {
+		if (
+			this.store.mempool.some((t) =>
+				areUint8ArraysEqual(t.hash, transaction.hash),
+			)
+		) {
+			throw new Error("Transaction already exists in mempool");
+		}
 		this.setStore("mempool", this.store.mempool.length, transaction);
+		logger.success(
+			`added transaction:${uint8ArrayToHex(transaction.hash.slice(0, 6))}... to mempool`,
+		);
 	}
 
 	/**
