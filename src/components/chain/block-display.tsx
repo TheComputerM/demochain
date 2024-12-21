@@ -1,21 +1,44 @@
+import { Clipboard } from "@ark-ui/solid";
 import { encode } from "cbor2";
-import { type Component, For } from "solid-js";
-import { Divider } from "styled-system/jsx";
+import { type Component, For, type ParentComponent } from "solid-js";
+import { Divider, Grid, HStack } from "styled-system/jsx";
 import { uint8ArrayToHex } from "uint8array-extras";
 import { Card } from "~/components/ui/card";
 import { Table } from "~/components/ui/table";
 import type { Block } from "~/lib/blockchain/block";
+import TablerCopy from "~icons/tabler/copy";
+import TablerCopyCheck from "~icons/tabler/copy-check";
 import TablerExternalLink from "~icons/tabler/external-link";
 import { Badge } from "../ui/badge";
-import { Balance } from "./balance";
+import { Button } from "../ui/button";
 import { KeyDisplay } from "./key-display";
+import { TransactionDisplay } from "./transaction-display";
+
+const CopyButton: ParentComponent<{ value: string }> = (props) => {
+	return (
+		<Clipboard.Root value={props.value}>
+			<Clipboard.Trigger
+				asChild={(forwardProps) => (
+					<Button {...forwardProps()} size="xs">
+						{props.children}
+						<Clipboard.Indicator copied={<TablerCopyCheck />}>
+							<TablerCopy />
+						</Clipboard.Indicator>
+					</Button>
+				)}
+			/>
+		</Clipboard.Root>
+	);
+};
 
 export const BlockDisplay: Component<{ block: Block }> = (props) => {
+	const blockData = encode(props.block);
+	const hexBlockData = uint8ArrayToHex(blockData);
 	return (
 		<Card.Root wordWrap="break-word">
 			<Card.Header>
 				<Card.Title>Block #{props.block.index}</Card.Title>
-				<Card.Description>{uint8ArrayToHex(props.block.hash)}</Card.Description>
+				<Card.Description>{hexBlockData}</Card.Description>
 			</Card.Header>
 			<Card.Body>
 				<Table.Root size="sm">
@@ -30,7 +53,9 @@ export const BlockDisplay: Component<{ block: Block }> = (props) => {
 						</Table.Row>
 						<Table.Row>
 							<Table.Header>Previous Hash</Table.Header>
-							<Table.Cell>{uint8ArrayToHex(props.block.previousHash)}</Table.Cell>
+							<Table.Cell>
+								{uint8ArrayToHex(props.block.previousHash)}
+							</Table.Cell>
 						</Table.Row>
 						<Table.Row>
 							<Table.Header>Mined by</Table.Header>
@@ -40,46 +65,33 @@ export const BlockDisplay: Component<{ block: Block }> = (props) => {
 						</Table.Row>
 					</Table.Body>
 				</Table.Root>
-				<Divider borderColor="border.default" my="1" />
-				<Table.Root size="sm">
-					<Table.Head>
-						<Table.Header>From</Table.Header>
-						<Table.Header>To</Table.Header>
-						<Table.Header>Amount</Table.Header>
-					</Table.Head>
-					<Table.Body>
-						<For each={props.block.transactions}>
-							{(transaction) => (
-								<Table.Row>
-									<Table.Cell>
-										<KeyDisplay value={transaction.sender} />
-									</Table.Cell>
-									<Table.Cell>
-										<KeyDisplay value={transaction.recipient} />
-									</Table.Cell>
-									<Table.Cell>
-										<Balance>{transaction.amount}</Balance>
-									</Table.Cell>
-								</Table.Row>
-							)}
-						</For>
-					</Table.Body>
-				</Table.Root>
+				<Divider borderColor="border.default" my="3" />
+				<Grid columns={{ base: 1, md: 2 }}>
+					<For each={props.block.transactions}>
+						{(transaction) => <TransactionDisplay transaction={transaction} />}
+					</For>
+				</Grid>
 			</Card.Body>
-			<Card.Footer>
-				<Badge
-					variant="solid"
-					asChild={(forwardProps) => (
-						<a
-							{...forwardProps()}
-							href={`https://cbor.me/?bytes=${uint8ArrayToHex(encode(props.block))}`}
-							target="_blank"
-							rel="noreferrer"
-						>
-							CBOR Data <TablerExternalLink />
-						</a>
-					)}
-				/>
+			<Card.Footer justifyContent="space-between" alignItems="center">
+				<HStack>
+					<CopyButton value={hexBlockData}>Data (Hex)</CopyButton>
+				</HStack>
+				<HStack>
+					<Badge>Size: {blockData.byteLength}bytes</Badge>
+					<Badge
+						variant="solid"
+						asChild={(forwardProps) => (
+							<a
+								{...forwardProps()}
+								href={`https://cbor.me/?bytes=${hexBlockData}`}
+								target="_blank"
+								rel="noreferrer"
+							>
+								CBOR Data <TablerExternalLink />
+							</a>
+						)}
+					/>
+				</HStack>
 			</Card.Footer>
 		</Card.Root>
 	);
