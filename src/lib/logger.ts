@@ -4,6 +4,7 @@ import { type LogObject, createConsola } from "consola";
 export const logStore = new Store<LogObject[]>([]);
 
 export const logger = createConsola({
+	level: Number.POSITIVE_INFINITY,
 	reporters: [
 		{
 			log: (log) => {
