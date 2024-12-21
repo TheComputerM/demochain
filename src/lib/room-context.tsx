@@ -32,16 +32,16 @@ export const RoomProvider: ParentComponent = (props) => {
 
 	const room = joinRoom(TrysteroConfig, networkId);
 
-	logger.info(`Joined network ${networkId} as ${selfId}`);
+	logger.debug(`joined network '${networkId}' as peer:${selfId}`);
 
 	onMount(() => {
 		room.onPeerJoin((peer) => {
-			logger.info(`Peer ${peer} joined the network`);
+			logger.trace(`peer:${peer} joined the network`);
 			window.dispatchEvent(new CustomEvent("peer-join", { detail: peer }));
 		});
 
 		room.onPeerLeave((peer) => {
-			logger.info(`Peer ${peer} is offline`);
+			logger.trace(`peer:${peer} is offline`);
 			window.dispatchEvent(new CustomEvent("peer-leave", { detail: peer }));
 		});
 	});

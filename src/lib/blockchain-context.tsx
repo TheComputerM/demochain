@@ -72,23 +72,20 @@ export const BlockchainProvider: ParentComponent = (props) => {
 	recieveTransaction(async (data, peerId) => {
 		const [payload, signature] = decode<[Uint8Array, Uint8Array]>(data);
 		const senderWallet = blockchain.wallets.get(peerId);
-		if (!senderWallet) {
-			logger.error("Sender wallet not found");
-			return;
-		}
+		if (!senderWallet) throw new Error("Sender wallet not found");
+
 		const valid = senderWallet.verify(payload, signature);
-		if (!valid) {
-			logger.error("Invalid transaction signature");
-			return;
-		}
-		logger.info(`Received transaction from ${peerId}`);
+		if (!valid) throw new Error("Invalid signature");
+
+		logger.info(`received transaction from peer:${peerId}`);
 		blockchain.addTransaction(decode<Transaction>(payload));
 	});
 
 	const recieveBlock = room.makeAction<Uint8Array>(NetworkEvent.BLOCK)[1];
-	recieveBlock((data) => {
+	recieveBlock((data, peerId) => {
 		const block = decode<Block>(data);
-		logger.info(`Received block ${block.hash}`);
+		
+		logger.info(`received block ${block.hash} from peer:${peerId}`);
 		blockchain.appendBlock(block);
 	});
 

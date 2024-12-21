@@ -4,7 +4,6 @@ import { HStack } from "styled-system/jsx";
 import { areUint8ArraysEqual } from "uint8array-extras";
 import { useBlockchain } from "~/lib/blockchain-context";
 import type { Transaction } from "~/lib/blockchain/transaction";
-import { logger } from "~/lib/logger";
 import { NetworkEvent, useRoom } from "~/lib/room-context";
 import { useWallet } from "~/lib/wallet-context";
 import TablerBroadcast from "~icons/tabler/broadcast";
@@ -21,7 +20,6 @@ const TransactionEntry: Component<{ transaction: Transaction }> = (props) => {
 		const data = encode(props.transaction);
 		const signature = await wallet.sign(data);
 		await broadcastTransaction(encode([data, signature]));
-		logger.info("Transaction broadcasted");
 	};
 
 	return (

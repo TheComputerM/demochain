@@ -104,7 +104,6 @@ export class Blockchain {
 	 * Validate the entire blockchain.
 	 */
 	static async validate(blocks: Block[]) {
-		const startTime = new Date().getTime();
 		for (let i = 1; i < blocks.length; i++) {
 			const block = blocks[i];
 			const previousBlock = blocks[i - 1];
@@ -113,8 +112,7 @@ export class Blockchain {
 
 			if (block.hash !== (await block.calculateHash())) return false;
 		}
-		const endTime = new Date().getTime();
-		logger.info(`Validated blockchain in ${endTime - startTime}ms`);
+		logger.info("validated blockchain integrity");
 		return true;
 	}
 

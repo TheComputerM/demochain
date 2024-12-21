@@ -39,14 +39,12 @@ export class Block {
 	}
 
 	async mine(difficulty: number) {
-		const startTime = new Date().getTime();
 		while (
 			this.hash.substring(0, difficulty) !== Array(difficulty + 1).join("0")
 		) {
 			this.nonce++;
 			this.hash = await this.calculateHash();
 		}
-		const endTime = new Date().getTime();
-		logger.log(`Mined block ${this.hash} in ${endTime - startTime}ms`);
+		logger.success(`mined block:${this.hash}`);
 	}
 }
