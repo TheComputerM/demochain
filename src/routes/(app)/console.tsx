@@ -16,7 +16,7 @@ export default function ConsolePage() {
 			<Table.Root size="sm">
 				<Table.Head>
 					<Table.Row>
-						<Table.Header>Level</Table.Header>
+						<Table.Header>Type</Table.Header>
 						<Table.Header>Message</Table.Header>
 					</Table.Row>
 				</Table.Head>
@@ -24,8 +24,8 @@ export default function ConsolePage() {
 					<For each={logs()}>
 						{(log) => (
 							<Table.Row>
-								<Table.Cell>{log.level}</Table.Cell>
-								<Table.Cell>{log.args[0]}</Table.Cell>
+								<Table.Cell>{log.type}</Table.Cell>
+								<Table.Cell>{log.args.join(";")}</Table.Cell>
 							</Table.Row>
 						)}
 					</For>

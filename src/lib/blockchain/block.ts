@@ -2,6 +2,7 @@ import { encode } from "cbor2";
 import { subtle } from "uncrypto";
 import { logger } from "../logger";
 import type { Transaction } from "./transaction";
+import { uint8ArrayToHex } from "uint8array-extras";
 
 export class Block {
 	index: number;
@@ -33,10 +34,7 @@ export class Block {
 	async calculateHash() {
 		const buffer = encode(this);
 		const hashBuffer = await subtle.digest("SHA-256", buffer);
-		const hashArray = Array.from(new Uint8Array(hashBuffer));
-		const hash = hashArray
-			.map((byte) => byte.toString(16).padStart(2, "0"))
-			.join("");
+		const hash = uint8ArrayToHex(new Uint8Array(hashBuffer));
 		return hash;
 	}
 
