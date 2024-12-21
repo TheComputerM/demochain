@@ -3,6 +3,7 @@ import {
 	createForm,
 	minRange,
 	required,
+	reset,
 } from "@modular-forms/solid";
 import { hexToUint8Array } from "uint8array-extras";
 import { useBlockchain } from "~/lib/blockchain-context";
@@ -23,6 +24,7 @@ export const CreateTransaction = () => {
 	};
 	const [form, { Form, Field: FormField }] = createForm<TransactionForm>({
 		initialValues: {
+			wallet: "",
 			amount: 0,
 		},
 	});
@@ -36,6 +38,7 @@ export const CreateTransaction = () => {
 			Date.now(),
 		);
 		blockchain.addTransaction(transaction);
+		reset(form);
 	};
 
 	return (
@@ -67,7 +70,10 @@ export const CreateTransaction = () => {
 					<FormField
 						name="amount"
 						type="number"
-						validate={[minRange(1, "Amount should be greater than 0")]}
+						validate={[
+							required("Amount cannot be empty"),
+							minRange(1, "Amount should be greater than 0"),
+						]}
 					>
 						{(field, props) => (
 							<Field.Root invalid={field.error.length > 0}>
