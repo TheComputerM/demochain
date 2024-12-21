@@ -36,15 +36,14 @@ export class Blockchain {
 			throw new Error("Genesis block already exists");
 		}
 
-		const transaction = new Transaction(
-			hexToUint8Array(
+		const transaction = await Transaction.create({
+			sender: hexToUint8Array(
 				// pssst, there is a secret message here
 				"6d6f6e65792067726f7773206f6e20746865206d65726b6c652074726565b42a552a010675e0ee6b612e74c73f0af04009ab295772092822b541ac1d34b2a5e0fa",
 			),
-			wallet.raw.public,
-			1000,
-			Date.now(),
-		);
+			recipient: wallet.raw.public,
+			amount: 1000,
+		});
 
 		const block = await Block.create({
 			index: 0,
@@ -90,9 +89,9 @@ export class Blockchain {
 				reconcile(
 					this.store.mempool.filter(
 						(transaction) =>
-							!block.transactions
-								.map((t) => t.timestamp)
-								.includes(transaction.timestamp),
+							!block.transactions.some((t) =>
+								areUint8ArraysEqual(t.hash, transaction.hash),
+							),
 					),
 				),
 			);
