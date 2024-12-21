@@ -38,7 +38,7 @@ export const BlockDisplay: Component<{ block: Block }> = (props) => {
 		<Card.Root wordWrap="break-word">
 			<Card.Header>
 				<Card.Title>Block #{props.block.index}</Card.Title>
-				<Card.Description>{hexBlockData}</Card.Description>
+				<Card.Description>{uint8ArrayToHex(props.block.hash)}</Card.Description>
 			</Card.Header>
 			<Card.Body>
 				<Table.Root size="sm">
