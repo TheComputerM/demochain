@@ -11,10 +11,25 @@ import { logger } from "./logger";
 
 const RoomContext = createContext<Room>();
 
-export enum NetworkEvent {
-	STATE = "net_state",
+export enum RoomEvent {
+	/**
+	 * Send/recieve network state
+	 */
+	NETWORK_STATE = "net_state",
+
+	/**
+	 * Send/recieve transactions to add to the mempool
+	 */
 	TRANSACTION = "sngl_tsx",
+
+	/**
+	 * Send/recieve mined blocks
+	 */
 	BLOCK = "sngl_blk",
+
+	/**
+	 * Send/recieve wallets when joining/leaving the network
+	 */
 	WALLET = "sngl_wlt",
 }
 

@@ -4,7 +4,7 @@ import { Box, Stack } from "styled-system/jsx";
 import { areUint8ArraysEqual } from "uint8array-extras";
 import { useBlockchain } from "~/lib/blockchain-context";
 import type { Block } from "~/lib/blockchain/block";
-import { NetworkEvent, useRoom } from "~/lib/room-context";
+import { RoomEvent, useRoom } from "~/lib/room-context";
 import { useWallet } from "~/lib/wallet-context";
 import TablerBroadcast from "~icons/tabler/broadcast";
 import { IconButton } from "../ui/icon-button";
@@ -12,7 +12,7 @@ import { BlockDisplay } from "./block-display";
 
 const BlockEntry: Component<{ block: Block }> = (props) => {
 	const room = useRoom();
-	const broadcastBlock = room.makeAction(NetworkEvent.BLOCK)[0];
+	const broadcastBlock = room.makeAction(RoomEvent.BLOCK)[0];
 
 	const broadcast = async () => {
 		const data = encode(props.block);

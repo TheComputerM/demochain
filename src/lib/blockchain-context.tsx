@@ -11,7 +11,7 @@ import { uint8ArrayToHex } from "uint8array-extras";
 import { Blockchain } from "~/lib/blockchain/chain";
 import type { Transaction } from "~/lib/blockchain/transaction";
 import { logger } from "~/lib/logger";
-import { NetworkEvent, TrysteroConfig, useRoom } from "~/lib/room-context";
+import { RoomEvent, TrysteroConfig, useRoom } from "~/lib/room-context";
 import type { Block } from "./blockchain/block";
 import { Wallet } from "./blockchain/wallet";
 import { useWallet } from "./wallet-context";
@@ -31,7 +31,7 @@ export const BlockchainProvider: ParentComponent = (props) => {
 	});
 
 	const [sendWallet, recieveWallet] = room.makeAction<Uint8Array>(
-		NetworkEvent.WALLET,
+		RoomEvent.WALLET,
 	);
 
 	recieveWallet(async (payload, peerId) => {
@@ -68,7 +68,7 @@ export const BlockchainProvider: ParentComponent = (props) => {
 	});
 
 	const recieveTransaction = room.makeAction<Uint8Array>(
-		NetworkEvent.TRANSACTION,
+		RoomEvent.TRANSACTION,
 	)[1];
 
 	recieveTransaction(async (data, peerId) => {
@@ -85,7 +85,7 @@ export const BlockchainProvider: ParentComponent = (props) => {
 		blockchain.addTransaction(transaction);
 	});
 
-	const recieveBlock = room.makeAction<Uint8Array>(NetworkEvent.BLOCK)[1];
+	const recieveBlock = room.makeAction<Uint8Array>(RoomEvent.BLOCK)[1];
 	recieveBlock(async (data, peerId) => {
 		const [payload, signature] = decode<[Uint8Array, Uint8Array]>(data);
 		const senderWallet = blockchain.wallets.get(peerId);
