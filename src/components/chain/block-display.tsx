@@ -15,7 +15,7 @@ export const BlockDisplay: Component<{ block: Block }> = (props) => {
 		<Card.Root wordWrap="break-word">
 			<Card.Header>
 				<Card.Title>Block #{props.block.index}</Card.Title>
-				<Card.Description>{props.block.hash}</Card.Description>
+				<Card.Description>{uint8ArrayToHex(props.block.hash)}</Card.Description>
 			</Card.Header>
 			<Card.Body>
 				<Table.Root size="sm">
@@ -30,7 +30,7 @@ export const BlockDisplay: Component<{ block: Block }> = (props) => {
 						</Table.Row>
 						<Table.Row>
 							<Table.Header>Previous Hash</Table.Header>
-							<Table.Cell>{props.block.previousHash}</Table.Cell>
+							<Table.Cell>{uint8ArrayToHex(props.block.previousHash)}</Table.Cell>
 						</Table.Row>
 						<Table.Row>
 							<Table.Header>Mined by</Table.Header>

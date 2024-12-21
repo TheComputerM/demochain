@@ -36,17 +36,27 @@ export class Blockchain {
 			throw new Error("Genesis block already exists");
 		}
 
-		const block = new Block(0, Date.now(), "", "", 0, publicKey, [
-			new Transaction(
-				hexToUint8Array(
-					// pssst, there is a secret message here
-					"6d6f6e65792067726f7773206f6e20746865206d65726b6c652074726565b42a552a010675e0ee6b612e74c73f0af04009ab295772092822b541ac1d34b2a5e0fa",
-				),
-				publicKey,
-				1000,
-				Date.now(),
+		const transaction = new Transaction(
+			hexToUint8Array(
+				// pssst, there is a secret message here
+				"6d6f6e65792067726f7773206f6e20746865206d65726b6c652074726565b42a552a010675e0ee6b612e74c73f0af04009ab295772092822b541ac1d34b2a5e0fa",
 			),
-		]);
+			publicKey,
+			1000,
+			Date.now(),
+		);
+
+		const block = new Block(
+			0,
+			Date.now(),
+			new Uint8Array([]),
+			new Uint8Array([]),
+			0,
+			publicKey,
+			[transaction],
+		);
+
+		block.hash = await block.calculateHash();
 
 		await block.mine(this.store.settings.difficulty);
 
@@ -62,13 +72,13 @@ export class Blockchain {
 		}
 
 		const previousBlock = this.store.blocks.at(-1)!;
-		if (previousBlock.hash !== block.previousHash) {
+		if (!areUint8ArraysEqual(block.previousHash, previousBlock.hash)) {
 			throw new Error("Invalid previousHash");
 		}
 		if (block.hash !== (await block.calculateHash())) {
 			throw new Error("Invalid block hash");
 		}
-		if (!block.hash.startsWith("0".repeat(this.store.settings.difficulty))) {
+		if (!block.satisfiesDifficulty(this.store.settings.difficulty)) {
 			throw new Error("Block does not meet difficulty requirements");
 		}
 
