@@ -5,13 +5,13 @@ import { logger } from "../logger";
 import { Block } from "./block";
 import { Transaction } from "./transaction";
 import type { Wallet } from "./wallet";
+import { ReactiveMap } from "@solid-primitives/map";
 
 export interface BlockchainSettings {
 	difficulty: number;
 }
 
 export interface BlockchainState {
-	wallets: Record<string, Wallet>;
 	blocks: Block[];
 	settings: BlockchainSettings;
 	mempool: Transaction[];
@@ -20,9 +20,11 @@ export interface BlockchainState {
 export class Blockchain {
 	store: BlockchainState;
 	setStore: SetStoreFunction<BlockchainState>;
+	wallets: ReactiveMap<string, Wallet>;
 
 	constructor(initial: BlockchainState) {
 		[this.store, this.setStore] = createStore(initial);
+		this.wallets = new ReactiveMap()
 	}
 
 	/**

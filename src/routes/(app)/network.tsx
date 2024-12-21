@@ -12,7 +12,7 @@ import TablerRefresh from "~icons/tabler/refresh";
 
 function NetworkSettings() {
 	const blockchain = useBlockchain();
-	const connectedPeers = () => Object.keys(blockchain.store.wallets).length;
+	const connectedPeers = () => blockchain.wallets.size;
 
 	return (
 		<Table.Root>
@@ -74,11 +74,10 @@ const PeerCard: Component<{ peerId: string; key: Uint8Array }> = (props) => {
 };
 
 function PeerGrid() {
-	const blockchain = useBlockchain();
-	const wallets = blockchain.store.wallets;
+	const wallets = useBlockchain().wallets;
 	return (
 		<Grid columns={{ base: 1, md: 2, xl: 3 }}>
-			<For each={Object.entries(wallets)}>
+			<For each={Array.from(wallets.entries())}>
 				{([peerId, data]) => <PeerCard peerId={peerId} key={data.raw.public} />}
 			</For>
 		</Grid>

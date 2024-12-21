@@ -21,7 +21,6 @@ export const BlockchainProvider: ParentComponent = (props) => {
 	const room = useRoom();
 	const wallet = useWallet();
 	const blockchain = new Blockchain({
-		wallets: {},
 		blocks: [],
 		settings: {
 			difficulty: 1,
@@ -36,7 +35,7 @@ export const BlockchainProvider: ParentComponent = (props) => {
 	recieveWallet(async (payload, peerId) => {
 		const publicKey = decode<Uint8Array>(payload);
 		const wallet = await Wallet.fromPublickey(publicKey);
-		blockchain.setStore("wallets", peerId, wallet);
+		blockchain.wallets.set(peerId, wallet);
 	});
 
 	onMount(async () => {
@@ -61,7 +60,7 @@ export const BlockchainProvider: ParentComponent = (props) => {
 			"peer-leave",
 			(event) => {
 				// remove peer from blockchain
-				blockchain.setStore("wallets", event.detail, null!);
+				blockchain.wallets.delete(event.detail);
 			},
 		);
 	});
@@ -72,7 +71,11 @@ export const BlockchainProvider: ParentComponent = (props) => {
 
 	recieveTransaction(async (data, peerId) => {
 		const [payload, signature] = decode<[Uint8Array, Uint8Array]>(data);
-		const senderWallet = blockchain.store.wallets[peerId];
+		const senderWallet = blockchain.wallets.get(peerId);
+		if (!senderWallet) {
+			logger.error("Sender wallet not found");
+			return;
+		}
 		const valid = senderWallet.verify(payload, signature);
 		if (!valid) {
 			logger.error("Invalid transaction signature");
