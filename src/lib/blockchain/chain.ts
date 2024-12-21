@@ -46,19 +46,14 @@ export class Blockchain {
 			Date.now(),
 		);
 
-		const block = new Block(
-			0,
-			Date.now(),
-			new Uint8Array([]),
-			new Uint8Array([]),
-			0,
-			wallet.raw.public,
-			[transaction],
-		);
-
-		block.hash = await block.calculateHash();
-
+		const block = await Block.create({
+			index: 0,
+			previousHash: new Uint8Array([]),
+			wallet,
+			transactions: [transaction],
+		});
 		await block.mine(this.store.settings.difficulty);
+		await block.sign(wallet);
 
 		this.setStore("blocks", 0, block);
 	}

@@ -3,6 +3,7 @@ import { uint8ArrayToHex } from "uint8array-extras";
 import { subtle } from "uncrypto";
 import { logger } from "../logger";
 import type { Transaction } from "./transaction";
+import type { Wallet } from "./wallet";
 
 export class Block {
 	index: number;
@@ -12,6 +13,8 @@ export class Block {
 	nonce: number;
 	minedBy: Uint8Array;
 	transactions: Transaction[];
+
+	signature?: Uint8Array;
 
 	constructor(
 		index: number,
@@ -56,5 +59,30 @@ export class Block {
 			this.hash = await this.calculateHash();
 		}
 		logger.success(`mined block:${uint8ArrayToHex(this.hash.slice(0, 6))}...`);
+	}
+
+	async sign(wallet: Wallet) {
+		const buffer = encode(this);
+		this.signature = await wallet.sign(buffer);
+	}
+
+	static async create(props: {
+		index: number;
+		previousHash: Uint8Array;
+		wallet: Wallet;
+		transactions: Transaction[];
+	}) {
+		const block = new Block(
+			props.index,
+			Date.now(),
+			new Uint8Array([]),
+			props.previousHash,
+			0,
+			props.wallet.raw.public,
+			props.transactions,
+		);
+
+		block.hash = await block.calculateHash();
+		return block;
 	}
 }

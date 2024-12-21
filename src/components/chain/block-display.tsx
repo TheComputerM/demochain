@@ -75,6 +75,9 @@ export const BlockDisplay: Component<{ block: Block }> = (props) => {
 			<Card.Footer justifyContent="space-between" alignItems="center">
 				<HStack>
 					<CopyButton value={hexBlockData}>Data (Hex)</CopyButton>
+					<CopyButton value={uint8ArrayToHex(props.block.signature!)}>
+						Signature (Hex)
+					</CopyButton>
 				</HStack>
 				<HStack>
 					<Badge>Size: {blockData.byteLength}bytes</Badge>
