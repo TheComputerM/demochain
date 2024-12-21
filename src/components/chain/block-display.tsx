@@ -1,8 +1,12 @@
+import { encode } from "cbor2";
 import { type Component, For } from "solid-js";
 import { Divider } from "styled-system/jsx";
+import { uint8ArrayToHex } from "uint8array-extras";
 import { Card } from "~/components/ui/card";
 import { Table } from "~/components/ui/table";
 import type { Block } from "~/lib/blockchain/block";
+import TablerExternalLink from "~icons/tabler/external-link";
+import { Badge } from "../ui/badge";
 import { Balance } from "./balance";
 import { KeyDisplay } from "./key-display";
 
@@ -62,6 +66,21 @@ export const BlockDisplay: Component<{ block: Block }> = (props) => {
 					</Table.Body>
 				</Table.Root>
 			</Card.Body>
+			<Card.Footer>
+				<Badge
+					variant="solid"
+					asChild={(forwardProps) => (
+						<a
+							{...forwardProps()}
+							href={`https://cbor.me/?bytes=${uint8ArrayToHex(encode(props.block))}`}
+							target="_blank"
+							rel="noreferrer"
+						>
+							CBOR Data <TablerExternalLink />
+						</a>
+					)}
+				/>
+			</Card.Footer>
 		</Card.Root>
 	);
 };
