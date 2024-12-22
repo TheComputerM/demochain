@@ -1,6 +1,6 @@
 import { A, type RouteSectionProps } from "@solidjs/router";
 import { clientOnly } from "node_modules/@solidjs/start/dist";
-import { ErrorBoundary, For } from "solid-js";
+import { For } from "solid-js";
 import { Portal } from "solid-js/web";
 import { css } from "styled-system/css";
 import { Container, Flex, Stack } from "styled-system/jsx";
@@ -96,16 +96,14 @@ export default function AppLayout(props: RouteSectionProps) {
 				</Stack>
 			</aside>
 			<Container mt="3" width="full">
-				<ErrorBoundary fallback={(err) => <div>Error: {err.message}</div>}>
-					<RoomProvider>
-						<WalletProvider>
-							<BlockchainProvider>
-								{props.children}
-								<ToasterContainer />
-							</BlockchainProvider>
-						</WalletProvider>
-					</RoomProvider>
-				</ErrorBoundary>
+				<RoomProvider>
+					<WalletProvider>
+						<BlockchainProvider>
+							{props.children}
+							<ToasterContainer />
+						</BlockchainProvider>
+					</WalletProvider>
+				</RoomProvider>
 			</Container>
 		</Flex>
 	);

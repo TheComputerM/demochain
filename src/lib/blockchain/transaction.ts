@@ -1,5 +1,5 @@
+import { signAsync, verifyAsync } from "@noble/ed25519";
 import { encode } from "cbor2";
-import { type PrivateKey, PublicKey } from "./keys";
 
 type TransactionData = {
 	nonce: number;
@@ -70,16 +70,15 @@ export class Transaction {
 	/**
 	 * signs the transaction with the provided private key
 	 */
-	async sign(privateKey: PrivateKey) {
+	async sign(privateKey: Uint8Array) {
 		const buffer = encode(this.data);
-		this._internal.signature = await privateKey.sign(buffer);
+		this._internal.signature = await signAsync(buffer, privateKey);
 	}
 
 	/**
 	 * verifies the transaction signature
 	 */
 	async verify() {
-		const publicKey = new PublicKey(this.sender);
-		return await publicKey.verify(encode(this.data), this.signature);
+		return await verifyAsync(this.signature, encode(this.data), this.sender);
 	}
 }

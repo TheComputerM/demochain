@@ -1,3 +1,4 @@
+import * as ed from "@noble/ed25519";
 import {
 	type ParentComponent,
 	Show,
@@ -5,17 +6,22 @@ import {
 	createResource,
 	useContext,
 } from "solid-js";
-import { PrivateKey, PublicKey } from "./blockchain/keys";
+import { hexToUint8Array, uint8ArrayToHex } from "uint8array-extras";
 
 const WalletContext = createContext<{
-	private: PrivateKey;
-	public: PublicKey;
+	private: Uint8Array;
+	public: Uint8Array;
 }>();
 
 export const WalletProvider: ParentComponent = (props) => {
 	const [wallet] = createResource(async () => {
-		const privateKey = PrivateKey.generate();
-		const publicKey = await PublicKey.fromPrivateKey(privateKey.key);
+		const stored = sessionStorage.getItem("wallet");
+		const privateKey = stored
+			? hexToUint8Array(stored)
+			: ed.utils.randomPrivateKey();
+		sessionStorage.setItem("wallet", uint8ArrayToHex(privateKey));
+		const publicKey = await ed.getPublicKeyAsync(privateKey);
+
 		return { private: privateKey, public: publicKey };
 	});
 

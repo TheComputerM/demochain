@@ -28,7 +28,7 @@ export const CreateTransaction = () => {
 	};
 
 	const initialValues = {
-		nonce: blockchain.getLatestTransactionNonce(wallet.public.key) + 1,
+		nonce: blockchain.getLatestTransactionNonce(wallet.public) + 1,
 		wallet: "",
 		gas: 2,
 		amount: 10,
@@ -42,7 +42,7 @@ export const CreateTransaction = () => {
 		const recipient = hexToUint8Array(values.wallet);
 		const transaction = Transaction.create({
 			nonce: values.nonce,
-			sender: wallet.public.key,
+			sender: wallet.public,
 			recipient,
 			amount: values.amount,
 			gasFees: values.gas,

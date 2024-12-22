@@ -7,14 +7,13 @@ import {
 	useContext,
 } from "solid-js";
 import { unwrap } from "solid-js/store";
-import { getOccupants } from "trystero/firebase";
+import { getOccupants, selfId } from "trystero/firebase";
 import { uint8ArrayToHex } from "uint8array-extras";
 import { Blockchain } from "~/lib/blockchain/chain";
 import type { Transaction } from "~/lib/blockchain/transaction";
 import { LogError, logger } from "~/lib/logger";
 import { RoomEvent, TrysteroConfig, useRoom } from "~/lib/room-context";
 import type { Block } from "./blockchain/block";
-import { PublicKey } from "./blockchain/keys";
 import { useWallet } from "./wallet-context";
 
 const BlockchainContext = createContext<Blockchain>();
@@ -36,8 +35,7 @@ export const BlockchainProvider: ParentComponent = (props) => {
 
 	recieveWallet(async (payload, peerId) => {
 		const publicKey = decode<Uint8Array>(payload);
-		const wallet = new PublicKey(publicKey);
-		blockchain.peers.set(peerId, { publicKey: wallet });
+		blockchain.peers.set(peerId, { publicKey });
 	});
 
 	onMount(() => {
@@ -46,7 +44,7 @@ export const BlockchainProvider: ParentComponent = (props) => {
 			"peer-join",
 			(event) => {
 				// send our wallet to the new peer
-				sendWallet(encode(wallet.public.key), event.detail);
+				sendWallet(encode(wallet.public), event.detail);
 			},
 		);
 
@@ -73,8 +71,13 @@ export const BlockchainProvider: ParentComponent = (props) => {
 			sessionStorage.getItem("network")!,
 		);
 
-		if (occupants.length === 0) {
+		if (
+			occupants.length === 0 ||
+			(occupants.length === 1 && occupants[0] === selfId)
+		) {
 			blockchain.createGenesisBlock(wallet.private, wallet.public);
+		} else {
+			logger.info("Sync state with one of your peers");
 		}
 	});
 

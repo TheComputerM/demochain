@@ -11,7 +11,7 @@ import { useWallet } from "~/lib/wallet-context";
 export default function WalletPage() {
 	const blockchain = useBlockchain();
 	const wallet = useWallet();
-	const balance = () => blockchain.getBalance(wallet.public.key);
+	const balance = () => blockchain.getBalance(wallet.public);
 
 	return (
 		<Stack gap="6">
@@ -23,13 +23,13 @@ export default function WalletPage() {
 					<Table.Row>
 						<Table.Header>Public Key</Table.Header>
 						<Table.Cell>
-							<KeyDisplay value={wallet.public.key} />
+							<KeyDisplay value={wallet.public} />
 						</Table.Cell>
 					</Table.Row>
 					<Table.Row>
 						<Table.Header>Private Key</Table.Header>
 						<Table.Cell overflow="hidden" textOverflow="ellipsis" maxWidth="0">
-							<KeyDisplay value={wallet.private.key} />
+							<KeyDisplay value={wallet.private} />
 						</Table.Cell>
 					</Table.Row>
 					<Table.Row>

@@ -32,7 +32,7 @@ export const MineBlock: Component = () => {
 			index: blockchain.store.blocks.length,
 			previousHash: blockchain.store.blocks.at(-1)!.hash,
 			transactions,
-			minedBy: wallet.public.key,
+			minedBy: wallet.public,
 		});
 		await block.mine(blockchain.store.settings.difficulty);
 		await block.sign(wallet.private);

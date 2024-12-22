@@ -8,7 +8,6 @@ import {
 } from "uint8array-extras";
 import { LogError, logger } from "../logger";
 import { Block } from "./block";
-import type { PrivateKey, PublicKey } from "./keys";
 import { Transaction } from "./transaction";
 
 export interface BlockchainSettings {
@@ -27,7 +26,7 @@ export class Blockchain {
 	peers: ReactiveMap<
 		string,
 		{
-			publicKey: PublicKey;
+			publicKey: Uint8Array;
 		}
 	>;
 
@@ -39,7 +38,7 @@ export class Blockchain {
 	/**
 	 * creates the genesis block when there are no other nodes in the network.
 	 */
-	async createGenesisBlock(privateKey: PrivateKey, publicKey: PublicKey) {
+	async createGenesisBlock(privateKey: Uint8Array, publicKey: Uint8Array) {
 		if (this.store.blocks.length > 0) {
 			throw new LogError("Genesis block already exists");
 		}
@@ -50,7 +49,7 @@ export class Blockchain {
 				// pssst, there is a secret message here
 				"6d6f6e65792067726f7773206f6e20746865206d65726b6c652074726565b42a552a010675e0ee6b612e74c73f0af04009ab295772092822b541ac1d34b2a5e0fa",
 			),
-			recipient: publicKey.key,
+			recipient: publicKey,
 			amount: 1000,
 			gasFees: 0,
 		});
@@ -59,7 +58,7 @@ export class Blockchain {
 		const block = await Block.create({
 			index: 0,
 			previousHash: new Uint8Array([]),
-			minedBy: publicKey.key,
+			minedBy: publicKey,
 			transactions: [transaction],
 		});
 		await block.mine(this.store.settings.difficulty);

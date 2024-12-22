@@ -1,7 +1,7 @@
+import { signAsync, verifyAsync } from "@noble/ed25519";
 import { encode } from "cbor2";
 import { uint8ArrayToHex } from "uint8array-extras";
 import { logger } from "../logger";
-import { type PrivateKey, PublicKey } from "./keys";
 import type { Transaction } from "./transaction";
 
 type BlockData = {
@@ -116,16 +116,15 @@ export class Block {
 	/**
 	 * signs the block with the provided private key
 	 */
-	async sign(privateKey: PrivateKey) {
+	async sign(privateKey: Uint8Array) {
 		const buffer = encode(this.data);
-		this._internal.signature = await privateKey.sign(buffer);
+		this._internal.signature = await signAsync(buffer, privateKey);
 	}
 
 	/**
 	 * verifies the block signature
 	 */
 	async verify() {
-		const publicKey = new PublicKey(this.minedBy);
-		return await publicKey.verify(encode(this.data), this.signature);
+		return await verifyAsync(this.signature, encode(this.data), this.minedBy);
 	}
 }

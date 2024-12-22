@@ -35,8 +35,7 @@ export const BroadcastBlock: Component = () => {
 	const blocks = createMemo(() =>
 		blockchain.store.blocks.filter(
 			(block) =>
-				block.index !== 0 &&
-				areUint8ArraysEqual(block.minedBy, wallet.public.key),
+				block.index !== 0 && areUint8ArraysEqual(block.minedBy, wallet.public),
 		),
 	);
 

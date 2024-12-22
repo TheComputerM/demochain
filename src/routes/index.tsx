@@ -84,15 +84,10 @@ function EntryForm() {
 					<FormField name="wallet">
 						{(field, props) => (
 							<Field.Root invalid={field.error.length > 0}>
-								<Field.Label>Wallet Seed</Field.Label>
-								<Field.Input
-									{...props}
-									value={field.value}
-									type="text"
-									placeholder="passphrase"
-								/>
+								<Field.Label>Private key</Field.Label>
+								<Field.Input {...props} value={field.value} type="text" />
 								<Field.HelperText>
-									Seed used to generate your keys
+									Leave empty if you want to generate a random wallet
 								</Field.HelperText>
 								<Field.ErrorText>{field.error}</Field.ErrorText>
 							</Field.Root>

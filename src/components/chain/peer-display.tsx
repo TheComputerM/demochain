@@ -25,7 +25,7 @@ export const PeerDisplay: Component<{
 				<Table.Row>
 					<Table.Header>Public Key</Table.Header>
 					<Table.Cell>
-						<KeyDisplay value={peer.publicKey.key} />
+						<KeyDisplay value={peer.publicKey} />
 					</Table.Cell>
 				</Table.Row>
 				<Table.Row>
