@@ -10,7 +10,7 @@ export const VerifySignature: Component<{
 	const url = `https://cyphr.me/ed25519_tool/ed.html#?alg_type=Msg&msg_enc=Hex&msg=${props.message}&key_enc=Hex&key=${props.key}&sig=${props.signature}&verify`;
 	return (
 		<Badge
-			variant="outline"
+			variant="subtle"
 			borderRadius="sm"
 			asChild={(forwardProps) => (
 				<a
