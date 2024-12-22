@@ -87,19 +87,14 @@ export const BlockchainProvider: ParentComponent = (props) => {
 
 	const recieveBlock = room.makeAction<Uint8Array>(RoomEvent.BLOCK)[1];
 	recieveBlock(async (data, peerId) => {
-		const [payload, signature] = decode<[Uint8Array, Uint8Array]>(data);
-		const sender = blockchain.peers.get(peerId);
-		if (!sender) throw new Error("Sender peer not found");
-
-		const valid = sender.publicKey.verify(payload, signature);
-		if (!valid) throw new Error("Invalid signature");
-
-		const block = decode<Block>(payload);
-		block.signature = signature;
-		blockchain.appendBlock(block);
+		const block = decode<Block>(data);
 		logger.info(
 			`received block:${uint8ArrayToHex(block.hash.slice(0, 6))} from peer:${peerId}`,
 		);
+
+		if (!(await block.verify())) throw new Error("Invalid signature");
+
+		blockchain.appendBlock(block);
 	});
 
 	return (

@@ -4,28 +4,17 @@ import { Block } from "../blockchain/block";
 import { Transaction } from "../blockchain/transaction";
 
 // Serialization for Transaction class
-registerEncoder(Transaction, (b, _writer, _options) => [64000, [b.toJSON()]]);
+registerEncoder(Transaction, (b, _writer, _options) => [64000, b.toJSON()]);
 Tag.registerDecoder(
 	64000,
 	({ contents }) =>
-		new Transaction(...(contents as ConstructorParameters<typeof Transaction>)),
+		new Transaction(contents as ConstructorParameters<typeof Transaction>[0]),
 );
 
 // Serialization for Block class
-registerEncoder(Block, (b, _writer, _options) => [
-	64001,
-	[
-		b.index,
-		b.timestamp,
-		b.hash,
-		b.previousHash,
-		b.nonce,
-		b.minedBy,
-		b.transactions,
-	],
-]);
+registerEncoder(Block, (b, _writer, _options) => [64001, b.toJSON()]);
 Tag.registerDecoder(
 	64001,
 	({ contents }) =>
-		new Block(...(contents as ConstructorParameters<typeof Block>)),
+		new Block(contents as ConstructorParameters<typeof Block>[0]),
 );

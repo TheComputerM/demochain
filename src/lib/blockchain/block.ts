@@ -1,10 +1,10 @@
 import { encode } from "cbor2";
 import { uint8ArrayToHex } from "uint8array-extras";
 import { logger } from "../logger";
-import type { PrivateKey } from "./keys";
+import { type PrivateKey, PublicKey } from "./keys";
 import type { Transaction } from "./transaction";
 
-export class Block {
+type BlockData = {
 	index: number;
 	timestamp: number;
 	hash: Uint8Array;
@@ -12,25 +12,39 @@ export class Block {
 	nonce: number;
 	minedBy: Uint8Array;
 	transactions: Transaction[];
+	signature: Uint8Array;
+};
 
-	signature?: Uint8Array;
+export class Block {
+	constructor(private readonly _internal: BlockData) {}
 
-	constructor(
-		index: number,
-		timestamp: number,
-		hash: Uint8Array,
-		previousHash: Uint8Array,
-		nonce: number,
-		minedBy: Uint8Array,
-		transactions: Transaction[],
-	) {
-		this.index = index;
-		this.timestamp = timestamp;
-		this.hash = hash;
-		this.previousHash = previousHash;
-		this.nonce = nonce;
-		this.minedBy = minedBy;
-		this.transactions = transactions;
+	get index() {
+		return this._internal.index;
+	}
+	get timestamp() {
+		return this._internal.timestamp;
+	}
+	get hash() {
+		return this._internal.hash;
+	}
+	get previousHash() {
+		return this._internal.previousHash;
+	}
+	get nonce() {
+		return this._internal.nonce;
+	}
+	get minedBy() {
+		return this._internal.minedBy;
+	}
+	get transactions() {
+		return this._internal.transactions;
+	}
+	get signature() {
+		return this._internal.signature;
+	}
+
+	toJSON() {
+		return this._internal;
 	}
 
 	static async create(input: {
@@ -39,35 +53,37 @@ export class Block {
 		minedBy: Uint8Array;
 		transactions: Transaction[];
 	}) {
-		const block = new Block(
-			input.index,
-			Date.now(),
-			new Uint8Array([]),
-			input.previousHash,
-			0,
-			input.minedBy,
-			input.transactions,
-		);
+		const block = new Block({
+			timestamp: Date.now(),
+			hash: new Uint8Array(),
+			nonce: 0,
+			signature: new Uint8Array(),
+			...input,
+		});
 
-		block.hash = await block.calculateHash();
+		block._internal.hash = await block.calculateHash();
 		return block;
 	}
 
+	get data() {
+		const { signature: _, ...data } = this.toJSON();
+		return data;
+	}
+
 	async calculateHash() {
-		// calculate hash using every property except the hash itself
-		const buffer = encode([
-			this.index,
-			this.timestamp,
-			this.previousHash,
-			this.nonce,
-			this.minedBy,
-			this.transactions,
-		]);
+		// calculate hash using every property except the signature
+		// and the hash itself
+		const { hash: _, ...data } = this.data;
+
+		const buffer = encode(data);
 		const hashBuffer = await crypto.subtle.digest("SHA-256", buffer);
 		const hash = new Uint8Array(hashBuffer);
 		return hash;
 	}
 
+	/**
+	 * ensures that the block hash starts with [difficulty] number of 0s
+	 */
 	satisfiesDifficulty(difficulty: number) {
 		if (
 			!this.hash
@@ -82,14 +98,25 @@ export class Block {
 
 	async mine(difficulty: number) {
 		while (!this.satisfiesDifficulty(difficulty)) {
-			this.nonce++;
-			this.hash = await this.calculateHash();
+			this._internal.nonce++;
+			this._internal.hash = await this.calculateHash();
 		}
 		logger.success(`mined block:${uint8ArrayToHex(this.hash.slice(0, 6))}...`);
 	}
 
-	async sign(wallet: PrivateKey) {
-		const buffer = encode(this);
-		this.signature = await wallet.sign(buffer);
+	/**
+	 * signs the block with the provided private key
+	 */
+	async sign(privateKey: PrivateKey) {
+		const buffer = encode(this.data);
+		this._internal.signature = await privateKey.sign(buffer);
+	}
+
+	/**
+	 * verifies the block signature
+	 */
+	async verify() {
+		const publicKey = new PublicKey(this.minedBy);
+		return await publicKey.verify(encode(this.data), this.signature);
 	}
 }
