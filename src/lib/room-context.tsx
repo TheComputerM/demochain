@@ -13,9 +13,14 @@ const RoomContext = createContext<Room>();
 
 export enum RoomEvent {
 	/**
+	 * Send/recieve request to sync network state
+	 */
+	REQUEST_STATE = "req_state",
+
+	/**
 	 * Send/recieve network state
 	 */
-	NETWORK_STATE = "net_state",
+	SYNC_STATE = "syn_state",
 
 	/**
 	 * Send/recieve transactions to add to the mempool

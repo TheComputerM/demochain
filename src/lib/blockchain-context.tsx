@@ -6,6 +6,7 @@ import {
 	onMount,
 	useContext,
 } from "solid-js";
+import { unwrap } from "solid-js/store";
 import { getOccupants } from "trystero/firebase";
 import { uint8ArrayToHex } from "uint8array-extras";
 import { Blockchain } from "~/lib/blockchain/chain";
@@ -58,6 +59,13 @@ export const BlockchainProvider: ParentComponent = (props) => {
 				blockchain.peers.delete(event.detail);
 			},
 		);
+	});
+
+	const broadcastState = room.makeAction(RoomEvent.SYNC_STATE)[0];
+	const recieveStateSyncRequest = room.makeAction(RoomEvent.REQUEST_STATE)[1];
+
+	recieveStateSyncRequest((_, peerId) => {
+		broadcastState(encode(unwrap(blockchain.store)), peerId);
 	});
 
 	onMount(async () => {

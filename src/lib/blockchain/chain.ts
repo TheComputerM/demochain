@@ -133,9 +133,13 @@ export class Blockchain {
 			const block = blocks[i];
 			const previousBlock = blocks[i - 1];
 
-			if (block.previousHash !== previousBlock.hash) return false;
+			if (!areUint8ArraysEqual(block.previousHash, previousBlock.hash))
+				return false;
 
-			if (block.hash !== (await block.calculateHash())) return false;
+			if (!areUint8ArraysEqual(block.hash, await block.calculateHash()))
+				return false;
+
+			if (!(await block.verify())) return false;
 		}
 		logger.info("validated blockchain integrity");
 		return true;

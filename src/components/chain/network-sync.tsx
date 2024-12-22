@@ -1,7 +1,12 @@
+import { useDialog } from "@ark-ui/solid";
+import { decode } from "cbor2";
 import { createSignal } from "solid-js";
+import { reconcile } from "solid-js/store";
 import { For, Portal } from "solid-js/web";
 import { Box, Stack, Wrap } from "styled-system/jsx";
 import { useBlockchain } from "~/lib/blockchain-context";
+import { Blockchain, type BlockchainState } from "~/lib/blockchain/chain";
+import { RoomEvent, useRoom } from "~/lib/room-context";
 import TablerPackageImport from "~icons/tabler/package-import";
 import { Button } from "../ui/button";
 import { Dialog } from "../ui/dialog";
@@ -9,17 +14,33 @@ import { RadioGroup } from "../ui/radio-group";
 import { PeerDisplay } from "./peer-display";
 
 export const SyncDialog = () => {
+	const dialog = useDialog();
 	const blockchain = useBlockchain();
+	const room = useRoom();
 	const peers = blockchain.peers;
 
-	const [selectedPeer, setSelectedPeer] = createSignal<string | null>(null);
+	const [selectedPeer, setSelectedPeer] = createSignal<string | null>();
+
+	const requestState = room.makeAction(RoomEvent.REQUEST_STATE)[0];
+	const recieveState = room.makeAction<Uint8Array>(RoomEvent.SYNC_STATE)[1];
 
 	function startSync() {
-		console.log("TODO");
+		if (!selectedPeer()) {
+			throw new Error("no peer is selected");
+		}
+		requestState({}, selectedPeer());
 	}
 
+	recieveState(async (data) => {
+		const blockchainState = decode<BlockchainState>(data);
+		if (await Blockchain.validate(blockchainState.blocks)) {
+			blockchain.setStore(reconcile(blockchainState));
+			dialog().setOpen(false);
+		}
+	});
+
 	return (
-		<Dialog.Root>
+		<Dialog.RootProvider value={dialog}>
 			<Dialog.Trigger
 				asChild={(triggerProps) => (
 					<Button {...triggerProps()}>
@@ -60,10 +81,7 @@ export const SyncDialog = () => {
 												}
 											>
 												<RadioGroup.Item value={peerId}>
-													<PeerDisplay
-														peerId={peerId}
-														publicKey={data.publicKey}
-													/>
+													<PeerDisplay peerId={peerId} />
 													<RadioGroup.ItemControl />
 													<RadioGroup.ItemHiddenInput />
 												</RadioGroup.Item>
@@ -85,6 +103,6 @@ export const SyncDialog = () => {
 					</Dialog.Content>
 				</Dialog.Positioner>
 			</Portal>
-		</Dialog.Root>
+		</Dialog.RootProvider>
 	);
 };
