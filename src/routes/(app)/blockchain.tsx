@@ -1,6 +1,7 @@
 import { For, Show } from "solid-js";
-import { Stack } from "styled-system/jsx";
+import { Center, Stack } from "styled-system/jsx";
 import { BlockDisplay } from "~/components/chain/block-display";
+import { SyncDialog } from "~/components/chain/network-sync";
 import { Heading } from "~/components/ui/heading";
 import { Icon } from "~/components/ui/icon";
 import { useBlockchain } from "~/lib/blockchain-context";
@@ -15,21 +16,30 @@ export default function BlockchainPage() {
 				Blockchain
 			</Heading>
 			<Stack align="center">
-				<For each={blocks}>
-					{(block, i) => (
-						<>
-							<Show when={i() > 0}>
-								<Icon
-									size="2xl"
-									asChild={(forwardProps) => (
-										<TablerArrowDownSquareFilled {...forwardProps()} />
-									)}
-								/>
-							</Show>
-							<BlockDisplay block={block} />
-						</>
-					)}
-				</For>
+				<Show
+					when={blocks.length > 0}
+					fallback={
+						<Center height="md">
+							<SyncDialog />
+						</Center>
+					}
+				>
+					<For each={blocks}>
+						{(block, i) => (
+							<>
+								<Show when={i() > 0}>
+									<Icon
+										size="2xl"
+										asChild={(forwardProps) => (
+											<TablerArrowDownSquareFilled {...forwardProps()} />
+										)}
+									/>
+								</Show>
+								<BlockDisplay block={block} />
+							</>
+						)}
+					</For>
+				</Show>
 			</Stack>
 		</Stack>
 	);

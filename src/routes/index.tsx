@@ -39,7 +39,7 @@ function EntryForm() {
 	const handleSubmit: SubmitHandler<SettingsForm> = (values, event) => {
 		sessionStorage.setItem("network", values.network);
 		sessionStorage.setItem("wallet", values.wallet);
-		navigate("/console");
+		navigate("/blockchain");
 	};
 
 	return (

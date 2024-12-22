@@ -1,14 +1,11 @@
-import { type Component, For, Suspense, createResource } from "solid-js";
-import { Divider, Grid, HStack, Stack } from "styled-system/jsx";
+import { For } from "solid-js";
+import { Divider, Grid, Stack } from "styled-system/jsx";
 import { selfId } from "trystero/firebase";
-import { KeyDisplay } from "~/components/chain/key-display";
+import { PeerDisplay } from "~/components/chain/peer-display";
 import { Card } from "~/components/ui/card";
 import { Heading } from "~/components/ui/heading";
-import { IconButton } from "~/components/ui/icon-button";
 import { Table } from "~/components/ui/table";
 import { useBlockchain } from "~/lib/blockchain-context";
-import { useRoom } from "~/lib/room-context";
-import TablerRefresh from "~icons/tabler/refresh";
 
 function NetworkSettings() {
 	const blockchain = useBlockchain();
@@ -42,47 +39,16 @@ function NetworkSettings() {
 	);
 }
 
-const PeerCard: Component<{ peerId: string; key: Uint8Array }> = (props) => {
-	const room = useRoom();
-	const [ping, { refetch }] = createResource(() => room.ping(props.peerId));
-
-	return (
-		<Card.Root p="4" gap="2">
-			<Table.Root size="sm">
-				<Table.Body>
-					<Table.Row>
-						<Table.Header>Peer ID</Table.Header>
-						<Table.Cell>{props.peerId}</Table.Cell>
-					</Table.Row>
-					<Table.Row>
-						<Table.Header>Public Key</Table.Header>
-						<Table.Cell>
-							<KeyDisplay value={props.key} />
-						</Table.Cell>
-					</Table.Row>
-					<Table.Row>
-						<Table.Header>Ping</Table.Header>
-						<Table.Cell>
-							<HStack>
-								<Suspense fallback="...">{ping()}ms</Suspense>
-								<IconButton size="xs" onClick={refetch}>
-									<TablerRefresh />
-								</IconButton>
-							</HStack>
-						</Table.Cell>
-					</Table.Row>
-				</Table.Body>
-			</Table.Root>
-		</Card.Root>
-	);
-};
-
 function PeerGrid() {
 	const wallets = useBlockchain().wallets;
 	return (
 		<Grid columns={{ base: 1, md: 2, xl: 3 }}>
 			<For each={Array.from(wallets.entries())}>
-				{([peerId, data]) => <PeerCard peerId={peerId} key={data.raw.public} />}
+				{([peerId, wallet]) => (
+					<Card.Root p="4">
+						<PeerDisplay peerId={peerId} wallet={wallet} />
+					</Card.Root>
+				)}
 			</For>
 		</Grid>
 	);

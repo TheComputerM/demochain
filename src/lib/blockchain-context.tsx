@@ -40,14 +40,7 @@ export const BlockchainProvider: ParentComponent = (props) => {
 		blockchain.wallets.set(peerId, wallet);
 	});
 
-	onMount(async () => {
-		if (
-			(await getOccupants(TrysteroConfig, sessionStorage.getItem("network")!))
-				.length === 0
-		) {
-			blockchain.createGenesisBlock(wallet);
-		}
-
+	onMount(() => {
 		makeEventListener<{ "peer-join": CustomEvent<string> }>(
 			window,
 			"peer-join",
@@ -65,6 +58,17 @@ export const BlockchainProvider: ParentComponent = (props) => {
 				blockchain.wallets.delete(event.detail);
 			},
 		);
+	});
+
+	onMount(async () => {
+		const occupants = await getOccupants(
+			TrysteroConfig,
+			sessionStorage.getItem("network")!,
+		);
+
+		if (occupants.length === 0) {
+			blockchain.createGenesisBlock(wallet);
+		}
 	});
 
 	const recieveTransaction = room.makeAction<Uint8Array>(
