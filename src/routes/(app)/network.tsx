@@ -1,7 +1,8 @@
-import { For } from "solid-js";
+import { For, Show } from "solid-js";
 import { Divider, Grid, Stack } from "styled-system/jsx";
 import { selfId } from "trystero/firebase";
 import { PeerDisplay } from "~/components/chain/peer-display";
+import { EmptyPlaceholder } from "~/components/empty-placeholder";
 import { Card } from "~/components/ui/card";
 import { Heading } from "~/components/ui/heading";
 import { Table } from "~/components/ui/table";
@@ -42,15 +43,25 @@ function NetworkSettings() {
 function PeerGrid() {
 	const wallets = useBlockchain().peers;
 	return (
-		<Grid columns={{ base: 1, md: 2, xl: 3 }}>
-			<For each={Array.from(wallets.keys())}>
-				{(peerId) => (
-					<Card.Root p="4">
-						<PeerDisplay peerId={peerId} />
-					</Card.Root>
-				)}
-			</For>
-		</Grid>
+		<Show
+			when={wallets.size > 0}
+			fallback={
+				<EmptyPlaceholder
+					title="No peers :("
+					description="Open another tab or ask someone to join the network using the same network id."
+				/>
+			}
+		>
+			<Grid columns={{ base: 1, md: 2, xl: 3 }}>
+				<For each={Array.from(wallets.keys())}>
+					{(peerId) => (
+						<Card.Root p="4">
+							<PeerDisplay peerId={peerId} />
+						</Card.Root>
+					)}
+				</For>
+			</Grid>
+		</Show>
 	);
 }
 

@@ -1,4 +1,4 @@
-import { type Component, For, createEffect, createMemo } from "solid-js";
+import { type Component, For, Show, createEffect, createMemo } from "solid-js";
 import { createStore } from "solid-js/store";
 import { Stack } from "styled-system/jsx";
 import { TransactionDisplay } from "~/components/chain/transaction-display";
@@ -8,11 +8,13 @@ import { Checkbox } from "~/components/ui/checkbox";
 import { useBlockchain } from "~/lib/blockchain-context";
 import { Block } from "~/lib/blockchain/block";
 import { useWallet } from "~/lib/wallet-context";
+import { EmptyPlaceholder } from "../empty-placeholder";
 
 export const MineBlock: Component = () => {
 	const blockchain = useBlockchain();
 	const wallet = useWallet();
 	const mempool = blockchain.store.mempool;
+
 	const [store, setStore] = createStore<{ selected: boolean[] }>({
 		selected: [],
 	});
@@ -39,21 +41,31 @@ export const MineBlock: Component = () => {
 
 	return (
 		<Stack>
-			<For each={mempool}>
-				{(transaction, i) => (
-					<Card.Root flexDirection="row">
-						<TransactionDisplay transaction={transaction} />
-						<Checkbox
-							size="lg"
-							marginX="3"
-							checked={store.selected[i()]}
-							onCheckedChange={(e) => {
-								setStore("selected", i(), !!e.checked);
-							}}
-						/>
-					</Card.Root>
-				)}
-			</For>
+			<Show
+				when={mempool.length > 0}
+				fallback={
+					<EmptyPlaceholder
+						title="No transactions"
+						description="Create transactions or wait for another node to broadcast them."
+					/>
+				}
+			>
+				<For each={mempool}>
+					{(transaction, i) => (
+						<Card.Root flexDirection="row">
+							<TransactionDisplay transaction={transaction} />
+							<Checkbox
+								size="lg"
+								marginX="3"
+								checked={store.selected[i()]}
+								onCheckedChange={(e) => {
+									setStore("selected", i(), !!e.checked);
+								}}
+							/>
+						</Card.Root>
+					)}
+				</For>
+			</Show>
 			<Button width="full" disabled={selectedCount() === 0} onClick={mineBlock}>
 				Mine Block with {selectedCount()} Transactions
 			</Button>
