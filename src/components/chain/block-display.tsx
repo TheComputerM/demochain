@@ -7,11 +7,11 @@ import { Table } from "~/components/ui/table";
 import type { Block } from "~/lib/blockchain/block";
 import type { Transaction } from "~/lib/blockchain/transaction";
 import TablerCaretUpDownFilled from "~icons/tabler/caret-up-down-filled";
-import TablerExternalLink from "~icons/tabler/external-link";
 import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
 import { Collapsible } from "../ui/collapsible";
 import { CopyButton } from "../ui/copy-button";
+import { InspectCBOR } from "./inspect-cbor";
 import { KeyDisplay } from "./key-display";
 import { TransactionDisplay } from "./transaction-display";
 
@@ -40,8 +40,8 @@ const TransactionsList: Component<{ transactions: Transaction[] }> = (
 };
 
 export const BlockDisplay: Component<{ block: Block }> = (props) => {
-	const blockData = encode(props.block);
-	const hexBlockData = uint8ArrayToHex(blockData);
+	const raw = encode(props.block);
+	const hexBlockData = uint8ArrayToHex(raw);
 	return (
 		<Card.Root wordWrap="break-word">
 			<Card.Header>
@@ -83,20 +83,8 @@ export const BlockDisplay: Component<{ block: Block }> = (props) => {
 					</CopyButton>
 				</HStack>
 				<HStack>
-					<Badge>Size: {blockData.byteLength}bytes</Badge>
-					<Badge
-						variant="solid"
-						asChild={(forwardProps) => (
-							<a
-								{...forwardProps()}
-								href={`https://cbor.me/?bytes=${hexBlockData}`}
-								target="_blank"
-								rel="noreferrer"
-							>
-								CBOR Data <TablerExternalLink />
-							</a>
-						)}
-					/>
+					<Badge>Size: {raw.byteLength}B</Badge>
+					<InspectCBOR data={uint8ArrayToHex(raw)} />
 				</HStack>
 			</Card.Footer>
 		</Card.Root>

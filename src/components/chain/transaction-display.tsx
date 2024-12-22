@@ -7,11 +7,13 @@ import { Badge } from "../ui/badge";
 import { CopyButton } from "../ui/copy-button";
 import { Table } from "../ui/table";
 import { Balance } from "./balance";
+import { InspectCBOR } from "./inspect-cbor";
 import { KeyDisplay } from "./key-display";
 
 export const TransactionDisplay: Component<{ transaction: Transaction }> = (
 	props,
 ) => {
+	const raw = encode(props.transaction);
 	return (
 		<Table.Root size="sm" variant="outline">
 			<Table.Row>
@@ -46,7 +48,7 @@ export const TransactionDisplay: Component<{ transaction: Transaction }> = (
 			</Table.Row>
 
 			<Table.Row>
-				<Table.Cell rowSpan={2}>
+				<Table.Cell colSpan={2}>
 					<Wrap justify="space-between">
 						<HStack>
 							<CopyButton
@@ -63,13 +65,8 @@ export const TransactionDisplay: Component<{ transaction: Transaction }> = (
 							</CopyButton>
 						</HStack>
 						<HStack>
-							<Badge
-								asChild={(forwardProps) => (
-									<a {...forwardProps()} href="a">
-										CBOR
-									</a>
-								)}
-							/>
+							<Badge>Size: {raw.byteLength}B</Badge>
+							<InspectCBOR data={uint8ArrayToHex(raw)} />
 						</HStack>
 					</Wrap>
 				</Table.Cell>
