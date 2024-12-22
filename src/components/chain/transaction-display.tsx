@@ -9,11 +9,14 @@ import { Table } from "../ui/table";
 import { Balance } from "./balance";
 import { InspectCBOR } from "./inspect-cbor";
 import { KeyDisplay } from "./key-display";
+import { VerifySignature } from "./verify-signature";
 
 export const TransactionDisplay: Component<{ transaction: Transaction }> = (
 	props,
 ) => {
 	const raw = encode(props.transaction);
+	const signature = uint8ArrayToHex(props.transaction.signature);
+	const data = uint8ArrayToHex(encode(props.transaction.data));
 	return (
 		<Table.Root size="sm" variant="outline">
 			<Table.Row>
@@ -51,18 +54,17 @@ export const TransactionDisplay: Component<{ transaction: Transaction }> = (
 				<Table.Cell colSpan={2}>
 					<Wrap justify="space-between">
 						<HStack>
-							<CopyButton
-								value={uint8ArrayToHex(encode(props.transaction.data))}
-								variant="outline"
-							>
+							<CopyButton value={data} variant="outline">
 								Data
 							</CopyButton>
-							<CopyButton
-								value={uint8ArrayToHex(props.transaction.signature)}
-								variant="outline"
-							>
+							<CopyButton value={signature} variant="outline">
 								Signature
 							</CopyButton>
+							<VerifySignature
+								signature={signature}
+								message={data}
+								key={uint8ArrayToHex(props.transaction.sender)}
+							/>
 						</HStack>
 						<HStack>
 							<Badge>Size: {raw.byteLength}B</Badge>

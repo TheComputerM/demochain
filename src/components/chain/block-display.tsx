@@ -14,6 +14,7 @@ import { CopyButton } from "../ui/copy-button";
 import { InspectCBOR } from "./inspect-cbor";
 import { KeyDisplay } from "./key-display";
 import { TransactionDisplay } from "./transaction-display";
+import { VerifySignature } from "./verify-signature";
 
 const TransactionsList: Component<{ transactions: Transaction[] }> = (
 	props,
@@ -41,7 +42,9 @@ const TransactionsList: Component<{ transactions: Transaction[] }> = (
 
 export const BlockDisplay: Component<{ block: Block }> = (props) => {
 	const raw = encode(props.block);
-	const hexBlockData = uint8ArrayToHex(raw);
+	const data = uint8ArrayToHex(encode(props.block.data));
+	const signature = uint8ArrayToHex(props.block.signature);
+
 	return (
 		<Card.Root wordWrap="break-word">
 			<Card.Header>
@@ -77,10 +80,13 @@ export const BlockDisplay: Component<{ block: Block }> = (props) => {
 			</Card.Body>
 			<Card.Footer justifyContent="space-between" alignItems="center">
 				<HStack>
-					<CopyButton value={hexBlockData}>Data</CopyButton>
-					<CopyButton value={uint8ArrayToHex(props.block.signature!)}>
-						Signature
-					</CopyButton>
+					<CopyButton value={data}>Data</CopyButton>
+					<CopyButton value={signature}>Signature</CopyButton>
+					<VerifySignature
+						key={uint8ArrayToHex(props.block.minedBy)}
+						message={data}
+						signature={signature}
+					/>
 				</HStack>
 				<HStack>
 					<Badge>Size: {raw.byteLength}B</Badge>
