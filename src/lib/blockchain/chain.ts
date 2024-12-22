@@ -67,11 +67,10 @@ export class Blockchain {
 	 * Adds a block to the blockchain after verifying it is correct.
 	 */
 	async appendBlock(block: Block) {
-		if (this.store.blocks.length === 0) {
+		const previousBlock = this.store.blocks.at(-1);
+		if (!previousBlock) {
 			throw new Error("There is no genesis block");
 		}
-
-		const previousBlock = this.store.blocks.at(-1)!;
 		if (!areUint8ArraysEqual(block.previousHash, previousBlock.hash)) {
 			throw new Error("Invalid previousHash");
 		}
@@ -103,7 +102,9 @@ export class Blockchain {
 			);
 		});
 
-		logger.success(`added block:${uint8ArrayToHex(block.hash.slice(0, 6))}... to chain`);
+		logger.success(
+			`added block:${uint8ArrayToHex(block.hash.slice(0, 6))}... to chain`,
+		);
 	}
 
 	/**
