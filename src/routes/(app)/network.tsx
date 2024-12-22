@@ -43,10 +43,10 @@ function PeerGrid() {
 	const wallets = useBlockchain().peers;
 	return (
 		<Grid columns={{ base: 1, md: 2, xl: 3 }}>
-			<For each={Array.from(wallets.entries())}>
-				{([peerId, data]) => (
+			<For each={Array.from(wallets.keys())}>
+				{(peerId) => (
 					<Card.Root p="4">
-						<PeerDisplay peerId={peerId} publicKey={data.publicKey} />
+						<PeerDisplay peerId={peerId} />
 					</Card.Root>
 				)}
 			</For>

@@ -1,6 +1,6 @@
 import { type Component, Suspense, createResource } from "solid-js";
 import { HStack } from "styled-system/jsx";
-import type { PublicKey } from "~/lib/blockchain/keys";
+import { useBlockchain } from "~/lib/blockchain-context";
 import { useRoom } from "~/lib/room-context";
 import TablerRefresh from "~icons/tabler/refresh";
 import { IconButton } from "../ui/icon-button";
@@ -9,13 +9,14 @@ import { KeyDisplay } from "./key-display";
 
 export const PeerDisplay: Component<{
 	peerId: string;
-	publicKey: PublicKey;
 }> = (props) => {
+	const peers = useBlockchain().peers;
+	const peer = peers.get(props.peerId)!;
 	const room = useRoom();
 	const [ping, { refetch }] = createResource(() => room.ping(props.peerId));
 
 	return (
-		<Table.Root size="sm">
+		<Table.Root size="sm" variant="outline">
 			<Table.Body>
 				<Table.Row>
 					<Table.Header>Peer ID</Table.Header>
@@ -24,13 +25,13 @@ export const PeerDisplay: Component<{
 				<Table.Row>
 					<Table.Header>Public Key</Table.Header>
 					<Table.Cell>
-						<KeyDisplay value={props.publicKey.key} />
+						<KeyDisplay value={peer.publicKey.key} />
 					</Table.Cell>
 				</Table.Row>
 				<Table.Row>
 					<Table.Header>Ping</Table.Header>
 					<Table.Cell>
-						<HStack>
+						<HStack justify="space-between">
 							<Suspense fallback="...">{ping()}ms</Suspense>
 							<IconButton size="xs" onClick={refetch}>
 								<TablerRefresh />
