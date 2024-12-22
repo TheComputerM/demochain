@@ -37,7 +37,7 @@ export class Transaction {
 	}
 
 	/**
-	 * Creates a new transaction with sensible defaults
+	 * creates a new transaction with sensible defaults
 	 */
 	static create(input: {
 		nonce: number;
@@ -55,15 +55,15 @@ export class Transaction {
 	}
 
 	/**
-	 * Returns transaction data without the signature
+	 * returns transaction data without the signature
 	 */
 	get data() {
-		const { signature, ...data } = this._internal;
+		const { signature: _, ...data } = this._internal;
 		return data;
 	}
 
 	/**
-	 * Signs the transaction with the provided private key
+	 * signs the transaction with the provided private key
 	 */
 	async sign(privateKey: PrivateKey) {
 		const buffer = encode(this.data);
@@ -71,11 +71,10 @@ export class Transaction {
 	}
 
 	/**
-	 * Verifies the transaction signature
+	 * verifies the transaction signature
 	 */
 	async verify() {
-		const buffer = encode(this.data);
 		const publicKey = new PublicKey(this.sender);
-		return await publicKey.verify(buffer, this.signature);
+		return await publicKey.verify(encode(this.data), this.signature);
 	}
 }
