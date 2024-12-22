@@ -1,15 +1,43 @@
 import { encode } from "cbor2";
 import { type Component, For } from "solid-js";
-import { Divider, Grid, HStack } from "styled-system/jsx";
+import { HStack, Stack } from "styled-system/jsx";
 import { uint8ArrayToHex } from "uint8array-extras";
 import { Card } from "~/components/ui/card";
 import { Table } from "~/components/ui/table";
 import type { Block } from "~/lib/blockchain/block";
+import type { Transaction } from "~/lib/blockchain/transaction";
+import TablerCaretUpDownFilled from "~icons/tabler/caret-up-down-filled";
 import TablerExternalLink from "~icons/tabler/external-link";
 import { Badge } from "../ui/badge";
+import { Button } from "../ui/button";
+import { Collapsible } from "../ui/collapsible";
 import { CopyButton } from "../ui/copy-button";
 import { KeyDisplay } from "./key-display";
 import { TransactionDisplay } from "./transaction-display";
+
+const TransactionsList: Component<{ transactions: Transaction[] }> = (
+	props,
+) => {
+	return (
+		<Collapsible.Root>
+			<Collapsible.Trigger
+				asChild={(triggerProps) => (
+					<Button variant="subtle" {...triggerProps()} width="full" my="2">
+						Transactions
+						<TablerCaretUpDownFilled />
+					</Button>
+				)}
+			/>
+			<Collapsible.Content>
+				<Stack>
+					<For each={props.transactions}>
+						{(transaction) => <TransactionDisplay transaction={transaction} />}
+					</For>
+				</Stack>
+			</Collapsible.Content>
+		</Collapsible.Root>
+	);
+};
 
 export const BlockDisplay: Component<{ block: Block }> = (props) => {
 	const blockData = encode(props.block);
@@ -45,12 +73,7 @@ export const BlockDisplay: Component<{ block: Block }> = (props) => {
 						</Table.Row>
 					</Table.Body>
 				</Table.Root>
-				<Divider borderColor="border.default" my="3" />
-				<Grid columns={{ base: 1, md: 2 }}>
-					<For each={props.block.transactions}>
-						{(transaction) => <TransactionDisplay transaction={transaction} />}
-					</For>
-				</Grid>
+				<TransactionsList transactions={props.block.transactions} />
 			</Card.Body>
 			<Card.Footer justifyContent="space-between" alignItems="center">
 				<HStack>
