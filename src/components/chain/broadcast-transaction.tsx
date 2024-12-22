@@ -17,8 +17,7 @@ const TransactionEntry: Component<{ transaction: Transaction }> = (props) => {
 
 	const broadcast = async () => {
 		const data = encode(props.transaction);
-		const signature = props.transaction.signature;
-		await broadcastTransaction(encode([data, signature]));
+		await broadcastTransaction(encode(data));
 	};
 
 	return (

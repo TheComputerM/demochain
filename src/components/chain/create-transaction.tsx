@@ -19,24 +19,24 @@ export const CreateTransaction = () => {
 	const blockchain = useBlockchain();
 
 	type TransactionForm = {
+		nonce: number;
 		wallet: string;
 		amount: number;
 	};
 	const [form, { Form, Field: FormField }] = createForm<TransactionForm>({
 		initialValues: {
+			nonce: blockchain.getLatestTransactionNonce(wallet.public.key) + 1,
 			wallet: "",
 			amount: 0,
 		},
 	});
 
-	const handleSubmit: SubmitHandler<TransactionForm> = async (
-		values,
-		event,
-	) => {
-		const reciever = hexToUint8Array(values.wallet);
-		const transaction = await Transaction.create({
+	const handleSubmit: SubmitHandler<TransactionForm> = async (values) => {
+		const recipient = hexToUint8Array(values.wallet);
+		const transaction = Transaction.create({
+			nonce: values.nonce,
 			sender: wallet.public.key,
-			recipient: reciever,
+			recipient,
 			amount: values.amount,
 		});
 		await transaction.sign(wallet.private);
@@ -55,6 +55,26 @@ export const CreateTransaction = () => {
 			</Card.Header>
 			<Form style={{ display: "contents" }} onSubmit={handleSubmit}>
 				<Card.Body gap="3">
+					<FormField
+						name="nonce"
+						type="number"
+						validate={[
+							required("Nonce cannot be empty"),
+							minRange(1, "Nonce should be greater than 0"),
+						]}
+					>
+						{(field, props) => (
+							<Field.Root invalid={field.error.length > 0}>
+								<Field.Label>Nonce</Field.Label>
+								<Field.Input {...props} type="number" value={field.value} />
+								<Field.HelperText>
+									Nonce is the number of transactions you have sent. Similar to
+									the nonce in Ethereum transactions.
+								</Field.HelperText>
+								<Field.ErrorText>{field.error}</Field.ErrorText>
+							</Field.Root>
+						)}
+					</FormField>
 					<FormField
 						name="wallet"
 						validate={required("Wallet Public Key is required")}

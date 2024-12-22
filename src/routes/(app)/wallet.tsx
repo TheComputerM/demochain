@@ -1,4 +1,4 @@
-import { Grid, Stack } from "styled-system/jsx";
+import { Stack } from "styled-system/jsx";
 import { Balance } from "~/components/chain/balance";
 import { BroadcastTransaction } from "~/components/chain/broadcast-transaction";
 import { CreateTransaction } from "~/components/chain/create-transaction";
@@ -40,10 +40,10 @@ export default function WalletPage() {
 					</Table.Row>
 				</Table.Body>
 			</Table.Root>
-			<Grid columns={{ base: 1, lg: 2 }} alignItems="self-start">
+			<Stack>
 				<CreateTransaction />
 				<BroadcastTransaction />
-			</Grid>
+			</Stack>
 		</Stack>
 	);
 }

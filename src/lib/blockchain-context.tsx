@@ -76,16 +76,12 @@ export const BlockchainProvider: ParentComponent = (props) => {
 	)[1];
 
 	recieveTransaction(async (data, peerId) => {
-		const [payload, signature] = decode<[Uint8Array, Uint8Array]>(data);
-		const sender = blockchain.peers.get(peerId);
-		if (!sender) throw new Error("Sender peer not found");
-
-		const valid = await sender.publicKey.verify(payload, signature);
-		if (!valid) throw new Error("Invalid signature");
-
-		const transaction = decode<Transaction>(payload);
-		transaction.signature = signature;
+		const transaction = decode<Transaction>(data);
 		logger.info(`received transaction from peer:${peerId}`);
+		if (!(await transaction.verify())) {
+			throw new Error("Invalid transaction signature");
+		}
+
 		blockchain.addTransaction(transaction);
 	});
 
