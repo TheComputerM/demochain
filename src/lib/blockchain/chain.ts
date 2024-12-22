@@ -13,7 +13,6 @@ import { Transaction } from "./transaction";
 
 export interface BlockchainSettings {
 	difficulty: number;
-	baseReward: number;
 }
 
 export interface BlockchainState {
@@ -53,6 +52,7 @@ export class Blockchain {
 			),
 			recipient: publicKey.key,
 			amount: 1000,
+			gasFees: 0,
 		});
 		await transaction.sign(privateKey);
 
@@ -149,23 +149,16 @@ export class Blockchain {
 	 * returns the balance of a given address.
 	 */
 	getBalance(address: Uint8Array) {
-		const fromMining =
-			this.store.blocks.reduce(
-				(acc, block) =>
-					areUint8ArraysEqual(block.minedBy, address) ? acc + 1 : acc,
-				0,
-			) * this.store.settings.baseReward;
-
 		const fromTransactions = this.store.blocks
 			.flatMap((block) => block.transactions)
 			.reduce((acc, transaction) => {
 				if (areUint8ArraysEqual(transaction.sender, address))
-					return acc - transaction.amount;
+					return acc - transaction.amount - transaction.gasFees;
 				if (areUint8ArraysEqual(transaction.recipient, address))
-					return acc + transaction.amount;
+					return acc + transaction.amount + transaction.gasFees;
 				return acc;
 			}, 0);
-		return fromTransactions + fromMining;
+		return fromTransactions;
 	}
 
 	/**

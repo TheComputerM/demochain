@@ -28,10 +28,6 @@ function NetworkSettings() {
 					<Table.Cell>{blockchain.store.settings.difficulty}</Table.Cell>
 				</Table.Row>
 				<Table.Row>
-					<Table.Header>Base reward for mining</Table.Header>
-					<Table.Cell>{blockchain.store.settings.baseReward}</Table.Cell>
-				</Table.Row>
-				<Table.Row>
 					<Table.Header>Connected peers</Table.Header>
 					<Table.Cell>{connectedPeers()}</Table.Cell>
 				</Table.Row>

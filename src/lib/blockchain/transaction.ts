@@ -6,6 +6,7 @@ type TransactionData = {
 	sender: Uint8Array;
 	recipient: Uint8Array;
 	amount: number;
+	gasFees: number;
 	timestamp: number;
 	signature: Uint8Array;
 };
@@ -24,6 +25,9 @@ export class Transaction {
 	}
 	get amount() {
 		return this._internal.amount;
+	}
+	get gasFees() {
+		return this._internal.gasFees;
 	}
 	get timestamp() {
 		return this._internal.timestamp;
@@ -44,6 +48,7 @@ export class Transaction {
 		sender: Uint8Array;
 		recipient: Uint8Array;
 		amount: number;
+		gasFees: number;
 	}) {
 		const transaction = new Transaction({
 			timestamp: Date.now(),

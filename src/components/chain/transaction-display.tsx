@@ -22,6 +22,8 @@ export const TransactionDisplay: Component<{ transaction: Transaction }> = (
 			<Table.Row>
 				<Table.Header>Nonce</Table.Header>
 				<Table.Cell>{props.transaction.nonce}</Table.Cell>
+				<Table.Header>Timestamp</Table.Header>
+				<Table.Cell>{props.transaction.timestamp}</Table.Cell>
 			</Table.Row>
 
 			<Table.Row>
@@ -29,9 +31,6 @@ export const TransactionDisplay: Component<{ transaction: Transaction }> = (
 				<Table.Cell>
 					<KeyDisplay value={props.transaction.sender} />
 				</Table.Cell>
-			</Table.Row>
-
-			<Table.Row>
 				<Table.Header>To</Table.Header>
 				<Table.Cell>
 					<KeyDisplay value={props.transaction.recipient} />
@@ -43,15 +42,14 @@ export const TransactionDisplay: Component<{ transaction: Transaction }> = (
 				<Table.Cell>
 					<Balance>{props.transaction.amount}</Balance>
 				</Table.Cell>
+				<Table.Header>Gas fees</Table.Header>
+				<Table.Cell>
+					<Balance>{props.transaction.gasFees}</Balance>
+				</Table.Cell>
 			</Table.Row>
 
 			<Table.Row>
-				<Table.Header>Timestamp</Table.Header>
-				<Table.Cell>{props.transaction.timestamp}</Table.Cell>
-			</Table.Row>
-
-			<Table.Row>
-				<Table.Cell colSpan={2}>
+				<Table.Cell colSpan={4}>
 					<Wrap justify="space-between">
 						<HStack>
 							<CopyButton value={data} variant="outline">

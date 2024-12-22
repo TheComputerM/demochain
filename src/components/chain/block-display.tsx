@@ -15,6 +15,7 @@ import { InspectCBOR } from "./inspect-cbor";
 import { KeyDisplay } from "./key-display";
 import { TransactionDisplay } from "./transaction-display";
 import { VerifySignature } from "./verify-signature";
+import { Balance } from "./balance";
 
 const TransactionsList: Component<{ transactions: Transaction[] }> = (
 	props,
@@ -72,6 +73,12 @@ export const BlockDisplay: Component<{ block: Block }> = (props) => {
 							<Table.Header>Mined by</Table.Header>
 							<Table.Cell>
 								<KeyDisplay value={props.block.minedBy} />
+							</Table.Cell>
+						</Table.Row>
+						<Table.Row>
+							<Table.Header>Reward</Table.Header>
+							<Table.Cell>
+								<Balance>{props.block.getGasFees()}</Balance>
 							</Table.Cell>
 						</Table.Row>
 					</Table.Body>

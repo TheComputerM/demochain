@@ -42,6 +42,7 @@ export const CreateTransaction = () => {
 			sender: wallet.public.key,
 			recipient,
 			amount: values.amount,
+			gasFees: values.gas,
 		});
 		await transaction.sign(wallet.private);
 		blockchain.addTransaction(transaction);

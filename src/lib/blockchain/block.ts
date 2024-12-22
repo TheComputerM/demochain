@@ -105,6 +105,15 @@ export class Block {
 	}
 
 	/**
+	 * returns the total amount of gas fees of the transactions in the block
+	 */
+	getGasFees() {
+		return this.transactions.reduce((total, transaction) => {
+			return total + transaction.gasFees;
+		}, 0);
+	}
+
+	/**
 	 * signs the block with the provided private key
 	 */
 	async sign(privateKey: PrivateKey) {
