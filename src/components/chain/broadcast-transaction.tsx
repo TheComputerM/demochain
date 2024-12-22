@@ -36,7 +36,7 @@ export const BroadcastTransaction: Component = () => {
 	const mempool = useBlockchain().store.mempool;
 	const transactions = () =>
 		mempool.filter((transaction) =>
-			areUint8ArraysEqual(transaction.sender, wallet.raw.public),
+			areUint8ArraysEqual(transaction.sender, wallet.public.key),
 		);
 	return (
 		<Card.Root height="min-content">

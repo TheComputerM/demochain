@@ -35,11 +35,11 @@ export const CreateTransaction = () => {
 	) => {
 		const reciever = hexToUint8Array(values.wallet);
 		const transaction = await Transaction.create({
-			sender: wallet.raw.public,
+			sender: wallet.public.key,
 			recipient: reciever,
 			amount: values.amount,
 		});
-		await transaction.sign(wallet);
+		await transaction.sign(wallet.private);
 		blockchain.addTransaction(transaction);
 		reset(form);
 	};

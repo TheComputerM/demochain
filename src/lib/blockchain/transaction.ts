@@ -1,6 +1,5 @@
 import { encode } from "cbor2";
-import { subtle } from "uncrypto";
-import type { Wallet } from "./wallet";
+import type { PrivateKey } from "./keys";
 
 export class Transaction {
 	hash: Uint8Array;
@@ -48,13 +47,13 @@ export class Transaction {
 			this.amount,
 			this.timestamp,
 		]);
-		const hashBuffer = await subtle.digest("SHA-256", buffer);
+		const hashBuffer = await crypto.subtle.digest("SHA-256", buffer);
 		const hash = new Uint8Array(hashBuffer);
 		return hash;
 	}
 
-	async sign(wallet: Wallet) {
+	async sign(publicKey: PrivateKey) {
 		const buffer = encode(this);
-		this.signature = await wallet.sign(buffer);
+		this.signature = await publicKey.sign(buffer);
 	}
 }

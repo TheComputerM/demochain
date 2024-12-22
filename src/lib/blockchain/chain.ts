@@ -9,7 +9,7 @@ import {
 import { logger } from "../logger";
 import { Block } from "./block";
 import { Transaction } from "./transaction";
-import type { Wallet } from "./wallet";
+import type { PrivateKey, PublicKey } from "./keys";
 
 export interface BlockchainSettings {
 	difficulty: number;
@@ -25,17 +25,22 @@ export interface BlockchainState {
 export class Blockchain {
 	store: BlockchainState;
 	setStore: SetStoreFunction<BlockchainState>;
-	wallets: ReactiveMap<string, Wallet>;
+	peers: ReactiveMap<
+		string,
+		{
+			publicKey: PublicKey;
+		}
+	>;
 
 	constructor(initial: BlockchainState) {
 		[this.store, this.setStore] = createStore(initial);
-		this.wallets = new ReactiveMap();
+		this.peers = new ReactiveMap();
 	}
 
 	/**
 	 * Creates the genesis block when there are no other nodes in the network.
 	 */
-	async createGenesisBlock(wallet: Wallet) {
+	async createGenesisBlock(privateKey: PrivateKey, publicKey: PublicKey) {
 		if (this.store.blocks.length !== 0) {
 			throw new Error("Genesis block already exists");
 		}
@@ -45,19 +50,19 @@ export class Blockchain {
 				// pssst, there is a secret message here
 				"6d6f6e65792067726f7773206f6e20746865206d65726b6c652074726565b42a552a010675e0ee6b612e74c73f0af04009ab295772092822b541ac1d34b2a5e0fa",
 			),
-			recipient: wallet.raw.public,
+			recipient: publicKey.key,
 			amount: 1000,
 		});
-		await transaction.sign(wallet);
+		await transaction.sign(privateKey);
 
 		const block = await Block.create({
 			index: 0,
 			previousHash: new Uint8Array([]),
-			minedBy: wallet.raw.public,
+			minedBy: publicKey.key,
 			transactions: [transaction],
 		});
 		await block.mine(this.store.settings.difficulty);
-		await block.sign(wallet);
+		await block.sign(privateKey);
 
 		this.setStore("blocks", 0, block);
 		logger.debug("created genesis block");

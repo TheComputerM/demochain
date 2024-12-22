@@ -1,9 +1,8 @@
 import { encode } from "cbor2";
 import { uint8ArrayToHex } from "uint8array-extras";
-import { subtle } from "uncrypto";
 import { logger } from "../logger";
 import type { Transaction } from "./transaction";
-import type { Wallet } from "./wallet";
+import type { PrivateKey } from "./keys";
 
 export class Block {
 	index: number;
@@ -64,7 +63,7 @@ export class Block {
 			this.minedBy,
 			this.transactions,
 		]);
-		const hashBuffer = await subtle.digest("SHA-256", buffer);
+		const hashBuffer = await crypto.subtle.digest("SHA-256", buffer);
 		const hash = new Uint8Array(hashBuffer);
 		return hash;
 	}
@@ -89,7 +88,7 @@ export class Block {
 		logger.success(`mined block:${uint8ArrayToHex(this.hash.slice(0, 6))}...`);
 	}
 
-	async sign(wallet: Wallet) {
+	async sign(wallet: PrivateKey) {
 		const buffer = encode(this);
 		this.signature = await wallet.sign(buffer);
 	}

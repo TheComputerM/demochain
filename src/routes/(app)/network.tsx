@@ -9,7 +9,7 @@ import { useBlockchain } from "~/lib/blockchain-context";
 
 function NetworkSettings() {
 	const blockchain = useBlockchain();
-	const connectedPeers = () => blockchain.wallets.size;
+	const connectedPeers = () => blockchain.peers.size;
 
 	return (
 		<Table.Root>
@@ -40,13 +40,13 @@ function NetworkSettings() {
 }
 
 function PeerGrid() {
-	const wallets = useBlockchain().wallets;
+	const wallets = useBlockchain().peers;
 	return (
 		<Grid columns={{ base: 1, md: 2, xl: 3 }}>
 			<For each={Array.from(wallets.entries())}>
-				{([peerId, wallet]) => (
+				{([peerId, data]) => (
 					<Card.Root p="4">
-						<PeerDisplay peerId={peerId} wallet={wallet} />
+						<PeerDisplay peerId={peerId} publicKey={data.publicKey} />
 					</Card.Root>
 				)}
 			</For>
