@@ -15,9 +15,7 @@ const BlockEntry: Component<{ block: Block }> = (props) => {
 	const broadcastBlock = room.makeAction(RoomEvent.BLOCK)[0];
 
 	const broadcast = async () => {
-		const data = encode(props.block);
-		const signature = props.block.signature;
-		await broadcastBlock(encode([data, signature]));
+		await broadcastBlock(encode(props.block));
 	};
 
 	return (

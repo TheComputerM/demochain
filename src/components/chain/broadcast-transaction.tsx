@@ -16,8 +16,7 @@ const TransactionEntry: Component<{ transaction: Transaction }> = (props) => {
 	const broadcastTransaction = room.makeAction(RoomEvent.TRANSACTION)[0];
 
 	const broadcast = async () => {
-		const data = encode(props.transaction);
-		await broadcastTransaction(encode(data));
+		await broadcastTransaction(encode(props.transaction));
 	};
 
 	return (
