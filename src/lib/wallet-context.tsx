@@ -1,4 +1,5 @@
 import * as ed from "@noble/ed25519";
+import { Title } from "@solidjs/meta";
 import {
 	type ParentComponent,
 	Show,
@@ -28,6 +29,7 @@ export const WalletProvider: ParentComponent = (props) => {
 	return (
 		<Show when={wallet()}>
 			<WalletContext.Provider value={wallet()}>
+				<Title>Demochain | {uint8ArrayToHex(wallet()!.private)}</Title>
 				{props.children}
 			</WalletContext.Provider>
 		</Show>

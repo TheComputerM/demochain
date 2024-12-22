@@ -1,5 +1,6 @@
 {
-  "name": "example-basic",
+  "name": "demochain",
+  "private": true,
   "type": "module",
   "scripts": {
     "prepare": "panda codegen",
