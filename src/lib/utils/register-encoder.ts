@@ -4,10 +4,7 @@ import { Block } from "../blockchain/block";
 import { Transaction } from "../blockchain/transaction";
 
 // Serialization for Transaction class
-registerEncoder(Transaction, (b, _writer, _options) => [
-	64000,
-	[b.hash, b.sender, b.recipient, b.amount, b.timestamp],
-]);
+registerEncoder(Transaction, (b, _writer, _options) => [64000, [b.toJSON()]]);
 Tag.registerDecoder(
 	64000,
 	({ contents }) =>
