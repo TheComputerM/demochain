@@ -128,7 +128,9 @@ export class Blockchain {
 						t.nonce >= transaction.nonce,
 				)
 		) {
-			throw new LogError("transaction with a >= nonce is already present in the chain");
+			throw new LogError(
+				"transaction with a >= nonce is already present in the chain",
+			);
 		}
 
 		this.setStore("mempool", this.store.mempool.length, transaction);

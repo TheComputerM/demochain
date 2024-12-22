@@ -11,11 +11,11 @@ import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
 import { Collapsible } from "../ui/collapsible";
 import { CopyButton } from "../ui/copy-button";
+import { Balance } from "./balance";
 import { InspectCBOR } from "./inspect-cbor";
 import { KeyDisplay } from "./key-display";
 import { TransactionDisplay } from "./transaction-display";
 import { VerifySignature } from "./verify-signature";
-import { Balance } from "./balance";
 
 const TransactionsList: Component<{ transactions: Transaction[] }> = (
 	props,

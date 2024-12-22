@@ -1,6 +1,6 @@
 import { encode } from "cbor2";
 import { type Component, For, Show, createMemo } from "solid-js";
-import { HStack } from "styled-system/jsx";
+import { Divider, HStack } from "styled-system/jsx";
 import { areUint8ArraysEqual } from "uint8array-extras";
 import { useBlockchain } from "~/lib/blockchain-context";
 import type { Transaction } from "~/lib/blockchain/transaction";
@@ -46,7 +46,7 @@ export const BroadcastTransaction: Component = () => {
 					This will broadcast the selected transaction to the network.
 				</Card.Description>
 			</Card.Header>
-			<Card.Body gap="2" maxHeight="md" overflowY="auto">
+			<Card.Body gap="3" maxHeight="md" overflowY="auto">
 				<Show
 					when={transactions().length > 0}
 					fallback={
@@ -57,7 +57,14 @@ export const BroadcastTransaction: Component = () => {
 					}
 				>
 					<For each={transactions()}>
-						{(transaction) => <TransactionEntry transaction={transaction} />}
+						{(transaction, i) => (
+							<>
+								<Show when={i() > 0}>
+									<Divider />
+								</Show>
+								<TransactionEntry transaction={transaction} />
+							</>
+						)}
 					</For>
 				</Show>
 			</Card.Body>

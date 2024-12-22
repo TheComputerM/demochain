@@ -26,13 +26,16 @@ export const CreateTransaction = () => {
 		gas: number;
 		amount: number;
 	};
+
+	const initialValues = {
+		nonce: blockchain.getLatestTransactionNonce(wallet.public.key) + 1,
+		wallet: "",
+		gas: 2,
+		amount: 10,
+	};
+
 	const [form, { Form, Field: FormField }] = createForm<TransactionForm>({
-		initialValues: {
-			nonce: blockchain.getLatestTransactionNonce(wallet.public.key) + 1,
-			wallet: "",
-			gas: 2,
-			amount: 10,
-		},
+		initialValues,
 	});
 
 	const handleSubmit: SubmitHandler<TransactionForm> = async (values) => {
@@ -44,9 +47,16 @@ export const CreateTransaction = () => {
 			amount: values.amount,
 			gasFees: values.gas,
 		});
+
 		await transaction.sign(wallet.private);
 		blockchain.addTransaction(transaction);
-		reset(form);
+
+		reset(form, {
+			initialValues: {
+				...initialValues,
+				nonce: values.nonce + 1,
+			},
+		});
 	};
 
 	return (

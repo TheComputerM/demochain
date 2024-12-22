@@ -11,7 +11,7 @@ import { getOccupants } from "trystero/firebase";
 import { uint8ArrayToHex } from "uint8array-extras";
 import { Blockchain } from "~/lib/blockchain/chain";
 import type { Transaction } from "~/lib/blockchain/transaction";
-import { logger } from "~/lib/logger";
+import { LogError, logger } from "~/lib/logger";
 import { RoomEvent, TrysteroConfig, useRoom } from "~/lib/room-context";
 import type { Block } from "./blockchain/block";
 import { PublicKey } from "./blockchain/keys";
@@ -26,7 +26,6 @@ export const BlockchainProvider: ParentComponent = (props) => {
 		blocks: [],
 		settings: {
 			difficulty: 1,
-			baseReward: 5,
 		},
 		mempool: [],
 	});
@@ -86,8 +85,9 @@ export const BlockchainProvider: ParentComponent = (props) => {
 	recieveTransaction(async (data, peerId) => {
 		const transaction = decode<Transaction>(data);
 		logger.info(`received transaction from peer:${peerId}`);
+
 		if (!(await transaction.verify())) {
-			throw new Error("Invalid transaction signature");
+			throw new LogError("invalid transaction signature");
 		}
 
 		blockchain.addTransaction(transaction);
@@ -100,7 +100,9 @@ export const BlockchainProvider: ParentComponent = (props) => {
 			`received block:${uint8ArrayToHex(block.hash.slice(0, 6))} from peer:${peerId}`,
 		);
 
-		if (!(await block.verify())) throw new Error("Invalid signature");
+		if (!(await block.verify())) {
+			throw new LogError("invalid block signature");
+		}
 
 		blockchain.appendBlock(block);
 	});
