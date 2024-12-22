@@ -162,16 +162,22 @@ export class Blockchain {
 	 * returns the balance of a given address.
 	 */
 	getBalance(address: Uint8Array) {
+		const fromMining = this.store.blocks.reduce((acc, block) => {
+			if (areUint8ArraysEqual(block.minedBy, address)) {
+				return acc + block.getGasFees();
+			}
+			return acc;
+		}, 0);
 		const fromTransactions = this.store.blocks
 			.flatMap((block) => block.transactions)
 			.reduce((acc, transaction) => {
 				if (areUint8ArraysEqual(transaction.sender, address))
-					return acc - transaction.amount - transaction.gasFees;
+					return acc - transaction.amount;
 				if (areUint8ArraysEqual(transaction.recipient, address))
-					return acc + transaction.amount + transaction.gasFees;
+					return acc + transaction.amount;
 				return acc;
 			}, 0);
-		return fromTransactions;
+		return fromMining + fromTransactions;
 	}
 
 	/**
