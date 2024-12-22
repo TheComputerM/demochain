@@ -37,7 +37,7 @@ export const BroadcastBlock: Component = () => {
 		blockchain.store.blocks.filter(
 			(block) =>
 				block.index !== 0 &&
-				areUint8ArraysEqual(block.minedBy, wallet.raw.public),
+				areUint8ArraysEqual(block.minedBy, wallet.public.key),
 		);
 
 	return (

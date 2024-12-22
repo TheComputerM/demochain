@@ -1,60 +1,80 @@
 import { encode } from "cbor2";
-import { subtle } from "uncrypto";
-import type { Wallet } from "./wallet";
+import { type PrivateKey, PublicKey } from "./keys";
 
-export class Transaction {
-	hash: Uint8Array;
+type TransactionData = {
+	nonce: number;
 	sender: Uint8Array;
 	recipient: Uint8Array;
 	amount: number;
 	timestamp: number;
+	signature: Uint8Array;
+};
 
-	signature?: Uint8Array;
+export class Transaction {
+	constructor(private readonly _internal: TransactionData) {}
 
-	constructor(
-		hash: Uint8Array,
-		sender: Uint8Array,
-		recipient: Uint8Array,
-		amount: number,
-		timestamp: number,
-	) {
-		this.hash = hash;
-		this.sender = sender;
-		this.recipient = recipient;
-		this.amount = amount;
-		this.timestamp = timestamp;
+	get nonce() {
+		return this._internal.nonce;
+	}
+	get sender() {
+		return this._internal.sender;
+	}
+	get recipient() {
+		return this._internal.recipient;
+	}
+	get amount() {
+		return this._internal.amount;
+	}
+	get timestamp() {
+		return this._internal.timestamp;
+	}
+	get signature() {
+		return this._internal.signature;
 	}
 
-	static async create(input: {
+	toJSON() {
+		return this._internal;
+	}
+
+	/**
+	 * creates a new transaction with sensible defaults
+	 */
+	static create(input: {
+		nonce: number;
 		sender: Uint8Array;
 		recipient: Uint8Array;
 		amount: number;
 	}) {
-		const transaction = new Transaction(
-			new Uint8Array(),
-			input.sender,
-			input.recipient,
-			input.amount,
-			Date.now(),
-		);
-		transaction.hash = await transaction.calculateHash();
+		const transaction = new Transaction({
+			timestamp: Date.now(),
+			signature: new Uint8Array(0),
+			...input,
+		});
+
 		return transaction;
 	}
 
-	async calculateHash() {
-		const buffer = encode([
-			this.sender,
-			this.recipient,
-			this.amount,
-			this.timestamp,
-		]);
-		const hashBuffer = await subtle.digest("SHA-256", buffer);
-		const hash = new Uint8Array(hashBuffer);
-		return hash;
+	/**
+	 * returns transaction data without the signature
+	 */
+	get data() {
+		const { signature: _, ...data } = this._internal;
+		return data;
 	}
 
-	async sign(wallet: Wallet) {
-		const buffer = encode(this);
-		this.signature = await wallet.sign(buffer);
+	/**
+	 * signs the transaction with the provided private key
+	 */
+	async sign(privateKey: PrivateKey) {
+		const buffer = encode(this.data);
+		this._internal.signature = await privateKey.sign(buffer);
+	}
+
+	/**
+	 * verifies the transaction signature
+	 */
+	async verify() {
+		const publicKey = new PublicKey(this.sender);
+		return await publicKey.verify(encode(this.data), this.signature);
 	}
 }

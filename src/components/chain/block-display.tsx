@@ -1,19 +1,50 @@
 import { encode } from "cbor2";
 import { type Component, For } from "solid-js";
-import { Divider, Grid, HStack } from "styled-system/jsx";
+import { HStack, Stack } from "styled-system/jsx";
 import { uint8ArrayToHex } from "uint8array-extras";
 import { Card } from "~/components/ui/card";
 import { Table } from "~/components/ui/table";
 import type { Block } from "~/lib/blockchain/block";
-import TablerExternalLink from "~icons/tabler/external-link";
+import type { Transaction } from "~/lib/blockchain/transaction";
+import TablerCaretUpDownFilled from "~icons/tabler/caret-up-down-filled";
 import { Badge } from "../ui/badge";
+import { Button } from "../ui/button";
+import { Collapsible } from "../ui/collapsible";
 import { CopyButton } from "../ui/copy-button";
+import { InspectCBOR } from "./inspect-cbor";
 import { KeyDisplay } from "./key-display";
 import { TransactionDisplay } from "./transaction-display";
+import { VerifySignature } from "./verify-signature";
+
+const TransactionsList: Component<{ transactions: Transaction[] }> = (
+	props,
+) => {
+	return (
+		<Collapsible.Root>
+			<Collapsible.Trigger
+				asChild={(triggerProps) => (
+					<Button variant="subtle" {...triggerProps()} width="full" my="2">
+						Transactions
+						<TablerCaretUpDownFilled />
+					</Button>
+				)}
+			/>
+			<Collapsible.Content>
+				<Stack>
+					<For each={props.transactions}>
+						{(transaction) => <TransactionDisplay transaction={transaction} />}
+					</For>
+				</Stack>
+			</Collapsible.Content>
+		</Collapsible.Root>
+	);
+};
 
 export const BlockDisplay: Component<{ block: Block }> = (props) => {
-	const blockData = encode(props.block);
-	const hexBlockData = uint8ArrayToHex(blockData);
+	const raw = encode(props.block);
+	const data = uint8ArrayToHex(encode(props.block.data));
+	const signature = uint8ArrayToHex(props.block.signature);
+
 	return (
 		<Card.Root wordWrap="break-word">
 			<Card.Header>
@@ -45,35 +76,21 @@ export const BlockDisplay: Component<{ block: Block }> = (props) => {
 						</Table.Row>
 					</Table.Body>
 				</Table.Root>
-				<Divider borderColor="border.default" my="3" />
-				<Grid columns={{ base: 1, md: 2 }}>
-					<For each={props.block.transactions}>
-						{(transaction) => <TransactionDisplay transaction={transaction} />}
-					</For>
-				</Grid>
+				<TransactionsList transactions={props.block.transactions} />
 			</Card.Body>
 			<Card.Footer justifyContent="space-between" alignItems="center">
 				<HStack>
-					<CopyButton value={hexBlockData}>Data</CopyButton>
-					<CopyButton value={uint8ArrayToHex(props.block.signature!)}>
-						Signature
-					</CopyButton>
+					<CopyButton value={data}>Data</CopyButton>
+					<CopyButton value={signature}>Signature</CopyButton>
+					<VerifySignature
+						key={uint8ArrayToHex(props.block.minedBy)}
+						message={data}
+						signature={signature}
+					/>
 				</HStack>
 				<HStack>
-					<Badge>Size: {blockData.byteLength}bytes</Badge>
-					<Badge
-						variant="solid"
-						asChild={(forwardProps) => (
-							<a
-								{...forwardProps()}
-								href={`https://cbor.me/?bytes=${hexBlockData}`}
-								target="_blank"
-								rel="noreferrer"
-							>
-								CBOR Data <TablerExternalLink />
-							</a>
-						)}
-					/>
+					<Badge>Size: {raw.byteLength}B</Badge>
+					<InspectCBOR data={uint8ArrayToHex(raw)} />
 				</HStack>
 			</Card.Footer>
 		</Card.Root>

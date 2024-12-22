@@ -13,7 +13,7 @@ import type { Transaction } from "~/lib/blockchain/transaction";
 import { logger } from "~/lib/logger";
 import { RoomEvent, TrysteroConfig, useRoom } from "~/lib/room-context";
 import type { Block } from "./blockchain/block";
-import { Wallet } from "./blockchain/wallet";
+import { PublicKey } from "./blockchain/keys";
 import { useWallet } from "./wallet-context";
 
 const BlockchainContext = createContext<Blockchain>();
@@ -36,8 +36,8 @@ export const BlockchainProvider: ParentComponent = (props) => {
 
 	recieveWallet(async (payload, peerId) => {
 		const publicKey = decode<Uint8Array>(payload);
-		const wallet = await Wallet.fromPublickey(publicKey);
-		blockchain.wallets.set(peerId, wallet);
+		const wallet = new PublicKey(publicKey);
+		blockchain.peers.set(peerId, { publicKey: wallet });
 	});
 
 	onMount(() => {
@@ -46,7 +46,7 @@ export const BlockchainProvider: ParentComponent = (props) => {
 			"peer-join",
 			(event) => {
 				// send our wallet to the new peer
-				sendWallet(encode(wallet.raw.public), event.detail);
+				sendWallet(encode(wallet.public.key), event.detail);
 			},
 		);
 
@@ -55,7 +55,7 @@ export const BlockchainProvider: ParentComponent = (props) => {
 			"peer-leave",
 			(event) => {
 				// remove peer from blockchain
-				blockchain.wallets.delete(event.detail);
+				blockchain.peers.delete(event.detail);
 			},
 		);
 	});
@@ -67,7 +67,7 @@ export const BlockchainProvider: ParentComponent = (props) => {
 		);
 
 		if (occupants.length === 0) {
-			blockchain.createGenesisBlock(wallet);
+			blockchain.createGenesisBlock(wallet.private, wallet.public);
 		}
 	});
 
@@ -76,34 +76,25 @@ export const BlockchainProvider: ParentComponent = (props) => {
 	)[1];
 
 	recieveTransaction(async (data, peerId) => {
-		const [payload, signature] = decode<[Uint8Array, Uint8Array]>(data);
-		const senderWallet = blockchain.wallets.get(peerId);
-		if (!senderWallet) throw new Error("Sender wallet not found");
-
-		const valid = await senderWallet.verify(payload, signature);
-		if (!valid) throw new Error("Invalid signature");
-
-		const transaction = decode<Transaction>(payload);
-		transaction.signature = signature;
+		const transaction = decode<Transaction>(data);
 		logger.info(`received transaction from peer:${peerId}`);
+		if (!(await transaction.verify())) {
+			throw new Error("Invalid transaction signature");
+		}
+
 		blockchain.addTransaction(transaction);
 	});
 
 	const recieveBlock = room.makeAction<Uint8Array>(RoomEvent.BLOCK)[1];
 	recieveBlock(async (data, peerId) => {
-		const [payload, signature] = decode<[Uint8Array, Uint8Array]>(data);
-		const senderWallet = blockchain.wallets.get(peerId);
-		if (!senderWallet) throw new Error("Sender wallet not found");
-
-		const valid = senderWallet.verify(payload, signature);
-		if (!valid) throw new Error("Invalid signature");
-
-		const block = decode<Block>(payload);
-		block.signature = signature;
-		blockchain.appendBlock(block);
+		const block = decode<Block>(data);
 		logger.info(
 			`received block:${uint8ArrayToHex(block.hash.slice(0, 6))} from peer:${peerId}`,
 		);
+
+		if (!(await block.verify())) throw new Error("Invalid signature");
+
+		blockchain.appendBlock(block);
 	});
 
 	return (

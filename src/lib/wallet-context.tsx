@@ -5,14 +5,22 @@ import {
 	createResource,
 	useContext,
 } from "solid-js";
-import { Wallet } from "./blockchain/wallet";
+import { PrivateKey, PublicKey } from "./blockchain/keys";
 
-const WalletContext = createContext<Wallet>();
+const WalletContext = createContext<{
+	private: PrivateKey;
+	public: PublicKey;
+}>();
 
 export const WalletProvider: ParentComponent = (props) => {
-	const [wallet] = createResource(() => Wallet.generate());
+	const [wallet] = createResource(async () => {
+		const privateKey = PrivateKey.generate();
+		const publicKey = await PublicKey.fromPrivateKey(privateKey.key);
+		return { private: privateKey, public: publicKey };
+	});
+
 	return (
-		<Show when={wallet()} fallback="Loading wallet">
+		<Show when={wallet()}>
 			<WalletContext.Provider value={wallet()}>
 				{props.children}
 			</WalletContext.Provider>

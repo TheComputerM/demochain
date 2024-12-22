@@ -15,7 +15,7 @@ export default function BlockchainPage() {
 			<Heading as="h1" textStyle="4xl">
 				Blockchain
 			</Heading>
-			<Stack align="center">
+			<Stack>
 				<Show
 					when={blocks.length > 0}
 					fallback={
@@ -30,6 +30,7 @@ export default function BlockchainPage() {
 								<Show when={i() > 0}>
 									<Icon
 										size="2xl"
+										mx="auto"
 										asChild={(forwardProps) => (
 											<TablerArrowDownSquareFilled {...forwardProps()} />
 										)}

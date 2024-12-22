@@ -1,6 +1,6 @@
 import { ReactiveMap } from "@solid-primitives/map";
 import { batch } from "solid-js";
-import { type SetStoreFunction, createStore, reconcile } from "solid-js/store";
+import { type SetStoreFunction, createStore } from "solid-js/store";
 import {
 	areUint8ArraysEqual,
 	hexToUint8Array,
@@ -8,8 +8,8 @@ import {
 } from "uint8array-extras";
 import { logger } from "../logger";
 import { Block } from "./block";
+import type { PrivateKey, PublicKey } from "./keys";
 import { Transaction } from "./transaction";
-import type { Wallet } from "./wallet";
 
 export interface BlockchainSettings {
 	difficulty: number;
@@ -25,46 +25,52 @@ export interface BlockchainState {
 export class Blockchain {
 	store: BlockchainState;
 	setStore: SetStoreFunction<BlockchainState>;
-	wallets: ReactiveMap<string, Wallet>;
+	peers: ReactiveMap<
+		string,
+		{
+			publicKey: PublicKey;
+		}
+	>;
 
 	constructor(initial: BlockchainState) {
 		[this.store, this.setStore] = createStore(initial);
-		this.wallets = new ReactiveMap();
+		this.peers = new ReactiveMap();
 	}
 
 	/**
-	 * Creates the genesis block when there are no other nodes in the network.
+	 * creates the genesis block when there are no other nodes in the network.
 	 */
-	async createGenesisBlock(wallet: Wallet) {
-		if (this.store.blocks.length !== 0) {
+	async createGenesisBlock(privateKey: PrivateKey, publicKey: PublicKey) {
+		if (this.store.blocks.length > 0) {
 			throw new Error("Genesis block already exists");
 		}
 
 		const transaction = await Transaction.create({
+			nonce: 1,
 			sender: hexToUint8Array(
 				// pssst, there is a secret message here
 				"6d6f6e65792067726f7773206f6e20746865206d65726b6c652074726565b42a552a010675e0ee6b612e74c73f0af04009ab295772092822b541ac1d34b2a5e0fa",
 			),
-			recipient: wallet.raw.public,
+			recipient: publicKey.key,
 			amount: 1000,
 		});
-		await transaction.sign(wallet);
+		await transaction.sign(privateKey);
 
 		const block = await Block.create({
 			index: 0,
 			previousHash: new Uint8Array([]),
-			minedBy: wallet.raw.public,
+			minedBy: publicKey.key,
 			transactions: [transaction],
 		});
 		await block.mine(this.store.settings.difficulty);
-		await block.sign(wallet);
+		await block.sign(privateKey);
 
 		this.setStore("blocks", 0, block);
 		logger.debug("created genesis block");
 	}
 
 	/**
-	 * Adds a block to the blockchain after verifying it is correct.
+	 * adds a block to the blockchain after verifying it is correct.
 	 */
 	async appendBlock(block: Block) {
 		const previousBlock = this.store.blocks.at(-1);
@@ -89,17 +95,18 @@ export class Blockchain {
 
 		batch(() => {
 			this.setStore("blocks", this.store.blocks.length, block);
-			this.setStore(
-				"mempool",
-				reconcile(
-					this.store.mempool.filter(
-						(transaction) =>
-							!block.transactions.some((t) =>
-								areUint8ArraysEqual(t.hash, transaction.hash),
-							),
-					),
-				),
-			);
+			// TODO
+			// this.setStore(
+			// 	"mempool",
+			// 	reconcile(
+			// 		this.store.mempool.filter(
+			// 			(transaction) =>
+			// 				!block.transactions.some((t) =>
+			// 					areUint8ArraysEqual(t.hash, transaction.hash),
+			// 				),
+			// 		),
+			// 	),
+			// );
 		});
 
 		logger.success(
@@ -111,21 +118,15 @@ export class Blockchain {
 	 * adds a transaction to the node's mempool.
 	 */
 	addTransaction(transaction: Transaction) {
-		if (
-			this.store.mempool.some((t) =>
-				areUint8ArraysEqual(t.hash, transaction.hash),
-			)
-		) {
-			throw new Error("Transaction already exists in mempool");
-		}
+		// TODO: check if transaction is valid
 		this.setStore("mempool", this.store.mempool.length, transaction);
 		logger.success(
-			`added transaction:${uint8ArrayToHex(transaction.hash.slice(0, 6))}... to mempool`,
+			`added transaction:${transaction.nonce} from key:${uint8ArrayToHex(transaction.sender.slice(0, 6))}... to mempool`,
 		);
 	}
 
 	/**
-	 * Validate the entire blockchain.
+	 * validate the entire blockchain.
 	 */
 	static async validate(blocks: Block[]) {
 		for (let i = 1; i < blocks.length; i++) {
@@ -141,7 +142,7 @@ export class Blockchain {
 	}
 
 	/**
-	 * Returns the balance of a given address.
+	 * returns the balance of a given address.
 	 */
 	getBalance(address: Uint8Array) {
 		const fromMining =
@@ -161,5 +162,18 @@ export class Blockchain {
 				return acc;
 			}, 0);
 		return fromTransactions + fromMining;
+	}
+
+	/**
+	 * gets the latest transaction nonce for a given address.
+	 */
+	getLatestTransactionNonce(address: Uint8Array): number {
+		const transactions = this.store.blocks.flatMap(
+			(block) => block.transactions,
+		);
+		const latestTransaction = transactions.findLast((t) =>
+			areUint8ArraysEqual(t.sender, address),
+		);
+		return latestTransaction ? latestTransaction.nonce : 0;
 	}
 }

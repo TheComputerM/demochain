@@ -10,7 +10,7 @@ import { PeerDisplay } from "./peer-display";
 
 export const SyncDialog = () => {
 	const blockchain = useBlockchain();
-	const peers = blockchain.wallets;
+	const peers = blockchain.peers;
 
 	const [selectedPeer, setSelectedPeer] = createSignal<string | null>(null);
 
@@ -49,7 +49,7 @@ export const SyncDialog = () => {
 									justify="center"
 								>
 									<For each={Array.from(peers.entries())}>
-										{([peerId, wallet]) => (
+										{([peerId, data]) => (
 											<Box
 												borderWidth="1px"
 												paddingRight="2"
@@ -60,7 +60,10 @@ export const SyncDialog = () => {
 												}
 											>
 												<RadioGroup.Item value={peerId}>
-													<PeerDisplay peerId={peerId} wallet={wallet} />
+													<PeerDisplay
+														peerId={peerId}
+														publicKey={data.publicKey}
+													/>
 													<RadioGroup.ItemControl />
 													<RadioGroup.ItemHiddenInput />
 												</RadioGroup.Item>
