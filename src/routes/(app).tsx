@@ -1,6 +1,6 @@
 import { A, type RouteSectionProps } from "@solidjs/router";
 import { clientOnly } from "node_modules/@solidjs/start/dist";
-import { For } from "solid-js";
+import { ErrorBoundary, For } from "solid-js";
 import { Portal } from "solid-js/web";
 import { css } from "styled-system/css";
 import { Container, Flex, Stack } from "styled-system/jsx";
@@ -14,6 +14,7 @@ import TablerTerminal2 from "~icons/tabler/terminal-2";
 import TablerTopologyFull from "~icons/tabler/topology-full";
 import TablerWallet from "~icons/tabler/wallet";
 import "~/lib/utils/register-encoder";
+import { ToasterContainer } from "~/components/toaster";
 import { WalletProvider } from "~/lib/wallet-context";
 
 const RoomProvider = clientOnly(() =>
@@ -95,11 +96,16 @@ export default function AppLayout(props: RouteSectionProps) {
 				</Stack>
 			</aside>
 			<Container mt="3" width="full">
-				<RoomProvider>
-					<WalletProvider>
-						<BlockchainProvider>{props.children}</BlockchainProvider>
-					</WalletProvider>
-				</RoomProvider>
+				<ErrorBoundary fallback={(err) => <div>Error: {err.message}</div>}>
+					<RoomProvider>
+						<WalletProvider>
+							<BlockchainProvider>
+								{props.children}
+								<ToasterContainer />
+							</BlockchainProvider>
+						</WalletProvider>
+					</RoomProvider>
+				</ErrorBoundary>
 			</Container>
 		</Flex>
 	);
