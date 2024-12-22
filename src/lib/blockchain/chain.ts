@@ -1,12 +1,12 @@
 import { ReactiveMap } from "@solid-primitives/map";
 import { batch } from "solid-js";
-import { type SetStoreFunction, createStore } from "solid-js/store";
+import { type SetStoreFunction, createStore, reconcile } from "solid-js/store";
 import {
 	areUint8ArraysEqual,
 	hexToUint8Array,
 	uint8ArrayToHex,
 } from "uint8array-extras";
-import { logger } from "../logger";
+import { LogError, logger } from "../logger";
 import { Block } from "./block";
 import type { PrivateKey, PublicKey } from "./keys";
 import { Transaction } from "./transaction";
@@ -41,7 +41,7 @@ export class Blockchain {
 	 */
 	async createGenesisBlock(privateKey: PrivateKey, publicKey: PublicKey) {
 		if (this.store.blocks.length > 0) {
-			throw new Error("Genesis block already exists");
+			throw new LogError("Genesis block already exists");
 		}
 
 		const transaction = await Transaction.create({
@@ -75,38 +75,39 @@ export class Blockchain {
 	async appendBlock(block: Block) {
 		const previousBlock = this.store.blocks.at(-1);
 		if (!previousBlock) {
-			throw new Error("There is no genesis block");
+			throw new LogError("there is no genesis block");
 		}
 		if (!areUint8ArraysEqual(block.previousHash, previousBlock.hash)) {
-			throw new Error("Invalid previousHash");
+			throw new LogError("invalid previousHash");
 		}
 		if (!areUint8ArraysEqual(block.hash, await block.calculateHash())) {
-			throw new Error("Invalid block hash");
+			throw new LogError("invalid block hash");
 		}
 		if (!block.satisfiesDifficulty(this.store.settings.difficulty)) {
-			throw new Error("Block does not meet difficulty requirements");
+			throw new LogError("block does not meet difficulty requirements");
 		}
 
 		for (const transaction of block.transactions) {
 			if (this.getBalance(transaction.sender) < transaction.amount) {
-				throw new Error("Insufficient funds");
+				throw new LogError("sender has insufficient funds");
 			}
 		}
 
 		batch(() => {
 			this.setStore("blocks", this.store.blocks.length, block);
-			// TODO
-			// this.setStore(
-			// 	"mempool",
-			// 	reconcile(
-			// 		this.store.mempool.filter(
-			// 			(transaction) =>
-			// 				!block.transactions.some((t) =>
-			// 					areUint8ArraysEqual(t.hash, transaction.hash),
-			// 				),
-			// 		),
-			// 	),
-			// );
+			this.setStore(
+				"mempool",
+				reconcile(
+					this.store.mempool.filter(
+						(transaction) =>
+							!block.transactions.some(
+								(t) =>
+									areUint8ArraysEqual(t.sender, transaction.sender) &&
+									t.nonce === transaction.nonce,
+							),
+					),
+				),
+			);
 		});
 
 		logger.success(
@@ -118,7 +119,18 @@ export class Blockchain {
 	 * adds a transaction to the node's mempool.
 	 */
 	addTransaction(transaction: Transaction) {
-		// TODO: check if transaction is valid
+		if (
+			this.store.blocks
+				.flatMap((b) => b.transactions)
+				.some(
+					(t) =>
+						areUint8ArraysEqual(t.sender, transaction.sender) &&
+						t.nonce >= transaction.nonce,
+				)
+		) {
+			throw new LogError("transaction with a >= nonce is already present in the chain");
+		}
+
 		this.setStore("mempool", this.store.mempool.length, transaction);
 		logger.success(
 			`added transaction:${transaction.nonce} from key:${uint8ArrayToHex(transaction.sender.slice(0, 6))}... to mempool`,

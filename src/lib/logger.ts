@@ -13,3 +13,10 @@ export const logger = createConsola({
 		},
 	],
 });
+
+export class LogError extends Error {
+	constructor(message: string) {
+		logger.error(message);
+		super(message);
+	}
+}
