@@ -29,7 +29,7 @@ export const WalletProvider: ParentComponent = (props) => {
 	return (
 		<Show when={wallet()}>
 			<WalletContext.Provider value={wallet()}>
-				<Title>Demochain | {uint8ArrayToHex(wallet()!.private)}</Title>
+				<Title>Demochain | {uint8ArrayToHex(wallet()!.public)}</Title>
 				{props.children}
 			</WalletContext.Provider>
 		</Show>
