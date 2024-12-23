@@ -8,6 +8,7 @@ This network fully runs on your browser, standing on the shoulders of giants suc
 
 - [Trystero](https://github.com/dmotz/trystero): for the WebRTC p2p networking
 - [@noble/ed25519](https://github.com/paulmillr/noble-ed25519): for the encription algorithms used
+- [cbor2](https://www.npmjs.com/package/cbor2): for the JS implementation of the CBOR spec.
 - [Park UI](https://park-ui.com/): for the UI components
 - [SolidJS](https://www.solidjs.com/) and [SolidStart](https://start.solidjs.com/): for making the website itself
 
@@ -18,6 +19,7 @@ This network fully runs on your browser, standing on the shoulders of giants suc
 - Uses the Ed25519 algorithm for generating wallets.
 - Uses WebRTC for peer-2-peer all communication, except peer discovery which happens using a realtime database on firebase.
 - Uses PoW for consensus where difficulty is the number of leading 0s in the block's SHA-256 hash.
+- Uses the CBOR spec to encode blocks and transactions to send them over the network.
 - Can have multiple transactions in a single block.
 - Transactions are differentiated using a nonce, like in the ethereum network.
 - All transactions and blocks have a signature (of course).
