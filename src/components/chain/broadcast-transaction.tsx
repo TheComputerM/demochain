@@ -4,6 +4,7 @@ import { Divider, HStack } from "styled-system/jsx";
 import { areUint8ArraysEqual } from "uint8array-extras";
 import { useBlockchain } from "~/lib/blockchain-context";
 import type { Transaction } from "~/lib/blockchain/transaction";
+import { logger } from "~/lib/logger";
 import { RoomEvent, useRoom } from "~/lib/room-context";
 import { useWallet } from "~/lib/wallet-context";
 import TablerBroadcast from "~icons/tabler/broadcast";
@@ -18,6 +19,9 @@ const TransactionEntry: Component<{ transaction: Transaction }> = (props) => {
 
 	const broadcast = async () => {
 		await broadcastTransaction(encode(props.transaction));
+		logger.info(
+			`broadcasted transaction:${props.transaction.nonce} to the network`,
+		);
 	};
 
 	return (

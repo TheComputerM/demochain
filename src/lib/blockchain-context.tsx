@@ -77,7 +77,7 @@ export const BlockchainProvider: ParentComponent = (props) => {
 		) {
 			blockchain.createGenesisBlock(wallet.private, wallet.public);
 		} else {
-			logger.info("Sync state with one of your peers");
+			logger.info("choose a peer to sync state with");
 		}
 	});
 
@@ -100,7 +100,7 @@ export const BlockchainProvider: ParentComponent = (props) => {
 	recieveBlock(async (data, peerId) => {
 		const block = decode<Block>(data);
 		logger.info(
-			`received block:${uint8ArrayToHex(block.hash.slice(0, 6))} from peer:${peerId}`,
+			`received block:${uint8ArrayToHex(block.hash.slice(0, 6))}... from peer:${peerId}`,
 		);
 
 		if (!(await block.verify())) {

@@ -119,16 +119,10 @@ export class Blockchain {
 	 */
 	addTransaction(transaction: Transaction) {
 		if (
-			this.store.blocks
-				.flatMap((b) => b.transactions)
-				.some(
-					(t) =>
-						areUint8ArraysEqual(t.sender, transaction.sender) &&
-						t.nonce >= transaction.nonce,
-				)
+			this.getLatestTransactionNonce(transaction.sender) >= transaction.nonce
 		) {
 			throw new LogError(
-				"transaction with a >= nonce is already present in the chain",
+				`transaction with nonce >= ${transaction.nonce} is already present in the chain`,
 			);
 		}
 

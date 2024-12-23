@@ -1,9 +1,10 @@
 import { encode } from "cbor2";
 import { type Component, For, Show, createMemo } from "solid-js";
 import { Box, Stack } from "styled-system/jsx";
-import { areUint8ArraysEqual } from "uint8array-extras";
+import { areUint8ArraysEqual, uint8ArrayToHex } from "uint8array-extras";
 import { useBlockchain } from "~/lib/blockchain-context";
 import type { Block } from "~/lib/blockchain/block";
+import { logger } from "~/lib/logger";
 import { RoomEvent, useRoom } from "~/lib/room-context";
 import { useWallet } from "~/lib/wallet-context";
 import TablerBroadcast from "~icons/tabler/broadcast";
@@ -17,6 +18,9 @@ const BlockEntry: Component<{ block: Block }> = (props) => {
 
 	const broadcast = async () => {
 		await broadcastBlock(encode(props.block));
+		logger.info(
+			`broadcasted block:${uint8ArrayToHex(props.block.hash.slice(0, 6))}... to the network`,
+		);
 	};
 
 	return (
