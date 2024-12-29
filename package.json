@@ -12,7 +12,7 @@
   },
   "dependencies": {
     "@ark-ui/solid": "^4.6.0",
-    "@fontsource-variable/outfit": "^5.1.0",
+    "@fontsource-variable/outfit": "^5.1.1",
     "@modular-forms/solid": "^0.25.0",
     "@noble/ed25519": "^2.1.0",
     "@solid-primitives/event-listener": "^2.3.3",
@@ -21,9 +21,9 @@
     "@solidjs/meta": "^0.29.4",
     "@solidjs/router": "^0.15.2",
     "@solidjs/start": "^1.0.10",
-    "@tanstack/solid-store": "^0.6.0",
+    "@tanstack/solid-store": "^0.7.0",
     "cbor2": "^1.8.0",
-    "consola": "^3.3.0",
+    "consola": "^3.3.3",
     "firebase": "^11.1.0",
     "solid-js": "^1.9.3",
     "trystero": "^0.20.0",
@@ -39,7 +39,7 @@
   "devDependencies": {
     "@biomejs/biome": "1.9.4",
     "@iconify-json/tabler": "^1.2.13",
-    "@pandacss/dev": "^0.49.0",
+    "@pandacss/dev": "^0.50.0",
     "@park-ui/panda-preset": "^0.43.1",
     "unplugin-icons": "^0.22.0",
     "vite-tsconfig-paths": "^5.1.4"
