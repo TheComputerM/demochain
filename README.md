@@ -7,29 +7,32 @@ This is a toy blockchain network built for learning and demonstration. It starte
 This network fully runs on your browser, standing on the shoulders of giants such as:
 
 - [Trystero](https://github.com/dmotz/trystero): for the WebRTC p2p networking
-- [@noble/ed25519](https://github.com/paulmillr/noble-ed25519): for the encription algorithms used
-- [cbor2](https://www.npmjs.com/package/cbor2): for the JS implementation of the CBOR spec.
+- [@noble/ed25519](https://github.com/paulmillr/noble-ed25519): for the encryption algorithms used
+- [cbor2](https://www.npmjs.com/package/cbor2): for the JS implementation of the CBOR spec
 - [Park UI](https://park-ui.com/): for the UI components
-- [SolidJS](https://www.solidjs.com/) and [SolidStart](https://start.solidjs.com/): for making the website itself
+- [SolidJS](https://www.solidjs.com/) and [SolidStart](https://start.solidjs.com/): JavaScript framework and metaframework respectively
+- [Bun](https://bun.sh/) - JavaScript runtime
 
 ## Technical details
 
 > TODO: add more details in a separate doc
 
-- Uses the Ed25519 algorithm for generating wallets.
+- Uses the Ed25519 algorithm for generating wallets and signing transactions/blocks.
 - Uses WebRTC for peer-2-peer all communication, except peer discovery which happens using a realtime database on firebase.
 - Uses PoW for consensus where difficulty is the number of leading 0s in the block's SHA-256 hash.
 - Uses the CBOR spec to encode blocks and transactions to send them over the network.
 - Can have multiple transactions in a single block.
 - Transactions are differentiated using a nonce, like in the ethereum network.
-- All transactions and blocks have a signature (of course).
+- Transactions are signed by the one who created it.
+- Blocks are signed by the one who mined it.
 
 ## Future
 
 - Graphs for monitoring network activity.
-- Add videos demonstrating common concepts and attacks (such as race attack, finney attack etc...)
+- Add videos demonstrating common concepts and attacks (such as race attack, finney attack etc).
 - Add handy tool to manipulate blockchain data on your node.
 - Change difficulty dynamically.
+- Add button to broadcast after mine/create.
 
 ## Afterword
 
