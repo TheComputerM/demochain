@@ -1,4 +1,8 @@
+import { encode } from "cbor2";
 import type { ActionReceiver, ActionSender, Room } from "trystero";
+import type { Block } from "./blockchain/block";
+import type { Transaction } from "./blockchain/transaction";
+import { logger } from "./logger";
 
 export enum RoomEvent {
 	/**
@@ -54,3 +58,25 @@ export function recieveRoomEvent(type: RoomEvent) {
 	}
 	return event[1];
 }
+
+export const actions = {
+	/**
+	 * Broadcast a block to the entire network
+	 */
+	broadcastBlock: async (block: Block) => {
+		const sendBlock = sendRoomEvent(RoomEvent.BLOCK);
+		await sendBlock(encode(block));
+		logger.info(
+			`broadcasted block:${block.hash.slice(0, 6)}... to the network`,
+		);
+	},
+
+	/**
+	 * Broadcast a transaction to the entire network
+	 */
+	broadcastTransaction: async (transaction: Transaction) => {
+		const sendTransaction = sendRoomEvent(RoomEvent.TRANSACTION);
+		await sendTransaction(encode(transaction));
+		logger.info(`broadcasted transaction:${transaction.nonce} to the network`);
+	},
+};

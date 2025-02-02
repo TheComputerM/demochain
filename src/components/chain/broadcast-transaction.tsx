@@ -1,12 +1,9 @@
-import { encode } from "cbor2";
 import { type Component, For, Show, createMemo } from "solid-js";
 import { Divider, HStack } from "styled-system/jsx";
 import { areUint8ArraysEqual } from "uint8array-extras";
 import { useBlockchain } from "~/lib/blockchain-context";
 import type { Transaction } from "~/lib/blockchain/transaction";
-import { RoomEvent, sendRoomEvent } from "~/lib/events";
-import { logger } from "~/lib/logger";
-import { useRoom } from "~/lib/room-context";
+import { actions } from "~/lib/events";
 import { useWallet } from "~/lib/wallet-context";
 import TablerBroadcast from "~icons/tabler/broadcast";
 import { EmptyPlaceholder } from "../empty-placeholder";
@@ -15,14 +12,8 @@ import { IconButton } from "../ui/icon-button";
 import { TransactionDisplay } from "./transaction-display";
 
 const TransactionEntry: Component<{ transaction: Transaction }> = (props) => {
-	const room = useRoom();
-	const broadcastTransaction = sendRoomEvent(RoomEvent.TRANSACTION);
-
 	const broadcast = async () => {
-		await broadcastTransaction(encode(props.transaction));
-		logger.info(
-			`broadcasted transaction:${props.transaction.nonce} to the network`,
-		);
+		await actions.broadcastTransaction(props.transaction);
 	};
 
 	return (
