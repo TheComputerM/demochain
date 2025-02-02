@@ -1,6 +1,7 @@
 import { For, Show } from "solid-js";
-import { Divider, Grid, Stack } from "styled-system/jsx";
+import { Divider, Grid, HStack, Stack } from "styled-system/jsx";
 import { selfId } from "trystero/firebase";
+import { SyncDialog } from "~/components/chain/network-sync";
 import { PeerDisplay } from "~/components/chain/peer-display";
 import { EmptyPlaceholder } from "~/components/empty-placeholder";
 import { Card } from "~/components/ui/card";
@@ -64,9 +65,12 @@ function PeerGrid() {
 export default function NetworkPage() {
 	return (
 		<Stack gap="6">
-			<Heading as="h1" textStyle="4xl">
-				Network
-			</Heading>
+			<HStack justify="space-between">
+				<Heading as="h1" textStyle="4xl">
+					Network
+				</Heading>
+				<SyncDialog />
+			</HStack>
 			<Heading as="h2" textStyle="2xl">
 				Details
 			</Heading>
