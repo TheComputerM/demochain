@@ -14,6 +14,7 @@ import TablerTerminal2 from "~icons/tabler/terminal-2";
 import TablerTopologyFull from "~icons/tabler/topology-full";
 import TablerWallet from "~icons/tabler/wallet";
 import "~/lib/utils/register-encoder";
+import { Footer } from "~/components/footer";
 import { ToasterContainer } from "~/components/toaster";
 import { WalletProvider } from "~/lib/wallet-context";
 
@@ -104,6 +105,7 @@ export default function AppLayout(props: RouteSectionProps) {
 						</BlockchainProvider>
 					</WalletProvider>
 				</RoomProvider>
+				<Footer />
 			</Container>
 		</Flex>
 	);
