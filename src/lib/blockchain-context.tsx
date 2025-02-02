@@ -30,6 +30,7 @@ export const BlockchainProvider: ParentComponent = (props) => {
 		mempool: [],
 	});
 
+	// add peer's public key to node's memory to help identify them
 	const recieveWallet = recieveRoomEvent(RoomEvent.WALLET);
 	recieveWallet(async (payload, peerId) => {
 		const publicKey = decode<Uint8Array>(payload);
@@ -43,7 +44,6 @@ export const BlockchainProvider: ParentComponent = (props) => {
 			(event) => {
 				// send our wallet to the new peer
 				const sendWallet = sendRoomEvent(RoomEvent.WALLET);
-
 				sendWallet(encode(wallet.public), event.detail);
 			},
 		);
@@ -58,12 +58,14 @@ export const BlockchainProvider: ParentComponent = (props) => {
 		);
 	});
 
+	// sync state with a peer when requested
 	const broadcastState = sendRoomEvent(RoomEvent.SYNC_STATE);
 	const recieveStateSyncRequest = recieveRoomEvent(RoomEvent.REQUEST_STATE);
 	recieveStateSyncRequest((_, peerId) => {
 		broadcastState(encode(unwrap(blockchain.store)), peerId);
 	});
 
+	// if we are the first peer, create the genesis block
 	onMount(async () => {
 		const occupants = await getOccupants(
 			TrysteroConfig,
@@ -80,8 +82,8 @@ export const BlockchainProvider: ParentComponent = (props) => {
 		}
 	});
 
+	// recieve a transaction from a peer
 	const recieveTransaction = recieveRoomEvent(RoomEvent.TRANSACTION);
-
 	recieveTransaction(async (data, peerId) => {
 		const transaction = decode<Transaction>(data);
 		logger.info(`received transaction from peer:${peerId}`);
@@ -93,6 +95,7 @@ export const BlockchainProvider: ParentComponent = (props) => {
 		blockchain.addTransaction(transaction);
 	});
 
+	// recieve a block from a peer
 	const recieveBlock = recieveRoomEvent(RoomEvent.BLOCK);
 	recieveBlock(async (data, peerId) => {
 		const block = decode<Block>(data);

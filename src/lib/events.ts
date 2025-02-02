@@ -36,6 +36,9 @@ const eventsCache = new Map<
 	[ActionSender<Uint8Array>, ActionReceiver<Uint8Array>]
 >();
 
+/**
+ * Register all room events during room creation
+ */
 export function registerRoomEvents(room: Room) {
 	for (const event of Object.values(RoomEvent)) {
 		const [send, recieve] = room.makeAction<Uint8Array>(event);
@@ -43,6 +46,9 @@ export function registerRoomEvents(room: Room) {
 	}
 }
 
+/**
+ * Broadcast an event
+ */
 export function sendRoomEvent(type: RoomEvent) {
 	const event = eventsCache.get(type);
 	if (!event) {
@@ -51,6 +57,9 @@ export function sendRoomEvent(type: RoomEvent) {
 	return event[0];
 }
 
+/**
+ * Recieve an event from the network/room
+ */
 export function recieveRoomEvent(type: RoomEvent) {
 	const event = eventsCache.get(type);
 	if (!event) {
@@ -59,6 +68,9 @@ export function recieveRoomEvent(type: RoomEvent) {
 	return event[1];
 }
 
+/**
+ * Helper actions to wrap specific events
+ */
 export const actions = {
 	/**
 	 * Broadcast a block to the entire network

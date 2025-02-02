@@ -7,7 +7,6 @@ import { Box, Stack, Wrap } from "styled-system/jsx";
 import { useBlockchain } from "~/lib/blockchain-context";
 import { Blockchain, type BlockchainState } from "~/lib/blockchain/chain";
 import { RoomEvent, recieveRoomEvent, sendRoomEvent } from "~/lib/events";
-import { useRoom } from "~/lib/room-context";
 import TablerPackageImport from "~icons/tabler/package-import";
 import { Button } from "../ui/button";
 import { Dialog } from "../ui/dialog";
@@ -17,7 +16,6 @@ import { PeerDisplay } from "./peer-display";
 export const SyncDialog = () => {
 	const dialog = useDialog();
 	const blockchain = useBlockchain();
-	const room = useRoom();
 	const peers = blockchain.peers;
 
 	const [selectedPeer, setSelectedPeer] = createSignal<string | null>();
