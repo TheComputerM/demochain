@@ -1,30 +1,16 @@
 import { type Component, For, Show, createMemo } from "solid-js";
-import { Divider, HStack } from "styled-system/jsx";
+import { Flex, Stack } from "styled-system/jsx";
 import { areUint8ArraysEqual } from "uint8array-extras";
 import { useBlockchain } from "~/lib/blockchain-context";
-import type { Transaction } from "~/lib/blockchain/transaction";
 import { actions } from "~/lib/events";
 import { useWallet } from "~/lib/wallet-context";
 import TablerBroadcast from "~icons/tabler/broadcast";
 import { EmptyPlaceholder } from "../empty-placeholder";
+import { Button } from "../ui/button";
 import { Card } from "../ui/card";
-import { IconButton } from "../ui/icon-button";
+import { Heading } from "../ui/heading";
+import { Text } from "../ui/text";
 import { TransactionDisplay } from "./transaction-display";
-
-const TransactionEntry: Component<{ transaction: Transaction }> = (props) => {
-	const broadcast = async () => {
-		await actions.broadcastTransaction(props.transaction);
-	};
-
-	return (
-		<HStack>
-			<TransactionDisplay transaction={props.transaction} />
-			<IconButton onClick={broadcast}>
-				<TablerBroadcast />
-			</IconButton>
-		</HStack>
-	);
-};
 
 export const BroadcastTransaction: Component = () => {
 	const wallet = useWallet();
@@ -35,35 +21,41 @@ export const BroadcastTransaction: Component = () => {
 		),
 	);
 	return (
-		<Card.Root height="min-content">
-			<Card.Header>
-				<Card.Title>Broadcast Transaction</Card.Title>
-				<Card.Description>
+		<Stack gap="6">
+			<Stack>
+				<Heading as="h2" textStyle="2xl">
+					Broadcast Transaction
+				</Heading>
+				<Text color="fg.subtle">
 					This will broadcast the selected transaction to the network.
-				</Card.Description>
-			</Card.Header>
-			<Card.Body gap="3" maxHeight="md" overflowY="auto">
-				<Show
-					when={transactions().length > 0}
-					fallback={
-						<EmptyPlaceholder
-							title="No transactions"
-							description="Create transactions inorder to broadcast them to the network."
-						/>
-					}
-				>
-					<For each={transactions()}>
-						{(transaction, i) => (
-							<>
-								<Show when={i() > 0}>
-									<Divider />
-								</Show>
-								<TransactionEntry transaction={transaction} />
-							</>
-						)}
-					</For>
-				</Show>
-			</Card.Body>
-		</Card.Root>
+				</Text>
+			</Stack>
+			<Show
+				when={transactions().length > 0}
+				fallback={
+					<EmptyPlaceholder
+						title="No transactions"
+						description="Create transactions inorder to broadcast them to the network."
+					/>
+				}
+			>
+				<For each={transactions()}>
+					{(transaction) => (
+						<Card.Root>
+							<Flex direction="column">
+								<Button
+									variant="subtle"
+									onClick={() => actions.broadcastTransaction(transaction)}
+									borderBottomRadius="0"
+								>
+									Broadcast <TablerBroadcast />
+								</Button>
+								<TransactionDisplay transaction={transaction} />
+							</Flex>
+						</Card.Root>
+					)}
+				</For>
+			</Show>
+		</Stack>
 	);
 };

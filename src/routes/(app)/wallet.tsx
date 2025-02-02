@@ -1,4 +1,4 @@
-import { Stack } from "styled-system/jsx";
+import { Divider, Stack } from "styled-system/jsx";
 import { Balance } from "~/components/chain/balance";
 import { BroadcastTransaction } from "~/components/chain/broadcast-transaction";
 import { CreateTransaction } from "~/components/chain/create-transaction";
@@ -40,8 +40,9 @@ export default function WalletPage() {
 					</Table.Row>
 				</Table.Body>
 			</Table.Root>
-			<Stack>
+			<Stack gap="6">
 				<CreateTransaction />
+				<Divider />
 				<BroadcastTransaction />
 			</Stack>
 		</Stack>
