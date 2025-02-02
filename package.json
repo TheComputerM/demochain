@@ -11,21 +11,21 @@
     "check": "biome check src"
   },
   "dependencies": {
-    "@ark-ui/solid": "^4.6.0",
+    "@ark-ui/solid": "^4.10.1",
     "@fontsource-variable/outfit": "^5.1.1",
     "@modular-forms/solid": "^0.25.0",
-    "@noble/ed25519": "^2.1.0",
-    "@solid-primitives/event-listener": "^2.3.3",
-    "@solid-primitives/map": "^0.4.13",
-    "@solid-primitives/storage": "^4.2.1",
+    "@noble/ed25519": "^2.2.3",
+    "@solid-primitives/event-listener": "^2.4.0",
+    "@solid-primitives/map": "^0.6.0",
+    "@solid-primitives/storage": "^4.3.1",
     "@solidjs/meta": "^0.29.4",
-    "@solidjs/router": "^0.15.2",
-    "@solidjs/start": "^1.0.10",
+    "@solidjs/router": "^0.15.3",
+    "@solidjs/start": "^1.0.11",
     "@tanstack/solid-store": "^0.7.0",
-    "cbor2": "^1.8.0",
-    "consola": "^3.3.3",
-    "firebase": "^11.1.0",
-    "solid-js": "^1.9.3",
+    "cbor2": "^1.9.0",
+    "consola": "^3.4.0",
+    "firebase": "^11.2.0",
+    "solid-js": "^1.9.4",
     "trystero": "^0.20.0",
     "uint8array-extras": "^1.4.0",
     "vinxi": "^0.4.3"
@@ -38,10 +38,10 @@
   },
   "devDependencies": {
     "@biomejs/biome": "1.9.4",
-    "@iconify-json/tabler": "^1.2.13",
-    "@pandacss/dev": "^0.50.0",
+    "@iconify-json/tabler": "^1.2.15",
+    "@pandacss/dev": "^0.52.0",
     "@park-ui/panda-preset": "^0.43.1",
-    "unplugin-icons": "^0.22.0",
+    "unplugin-icons": "^22.0.0",
     "vite-tsconfig-paths": "^5.1.4"
   }
 }
