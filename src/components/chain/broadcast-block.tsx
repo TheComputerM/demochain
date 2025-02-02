@@ -2,32 +2,18 @@ import { type Component, For, Show, createMemo } from "solid-js";
 import { Box, Stack } from "styled-system/jsx";
 import { areUint8ArraysEqual } from "uint8array-extras";
 import { useBlockchain } from "~/lib/blockchain-context";
-import type { Block } from "~/lib/blockchain/block";
 import { actions } from "~/lib/events";
 import { useWallet } from "~/lib/wallet-context";
 import TablerBroadcast from "~icons/tabler/broadcast";
 import { EmptyPlaceholder } from "../empty-placeholder";
-import { IconButton } from "../ui/icon-button";
+import { Button } from "../ui/button";
 import { BlockDisplay } from "./block-display";
-
-const BlockEntry: Component<{ block: Block }> = (props) => {
-	const broadcast = async () => {
-		await actions.broadcastBlock(props.block);
-	};
-
-	return (
-		<Box position="relative">
-			<BlockDisplay block={props.block} />
-			<IconButton position="absolute" top="2" right="2" onClick={broadcast}>
-				<TablerBroadcast />
-			</IconButton>
-		</Box>
-	);
-};
 
 export const BroadcastBlock: Component = () => {
 	const blockchain = useBlockchain();
 	const wallet = useWallet();
+
+	// blocks that are mined by the user and are NOT the genesis block
 	const blocks = createMemo(() =>
 		blockchain.store.blocks.filter(
 			(block) =>
@@ -46,7 +32,21 @@ export const BroadcastBlock: Component = () => {
 					/>
 				}
 			>
-				<For each={blocks()}>{(block) => <BlockEntry block={block} />}</For>
+				<For each={blocks()}>
+					{(block) => (
+						<Box position="relative">
+							<BlockDisplay block={block} />
+							<Button
+								position="absolute"
+								top="2"
+								right="2"
+								onClick={() => actions.broadcastBlock(block)}
+							>
+								Broadcast <TablerBroadcast />
+							</Button>
+						</Box>
+					)}
+				</For>
 			</Show>
 		</Stack>
 	);
