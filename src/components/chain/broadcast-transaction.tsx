@@ -4,8 +4,9 @@ import { Divider, HStack } from "styled-system/jsx";
 import { areUint8ArraysEqual } from "uint8array-extras";
 import { useBlockchain } from "~/lib/blockchain-context";
 import type { Transaction } from "~/lib/blockchain/transaction";
+import { RoomEvent, sendRoomEvent } from "~/lib/events";
 import { logger } from "~/lib/logger";
-import { RoomEvent, useRoom } from "~/lib/room-context";
+import { useRoom } from "~/lib/room-context";
 import { useWallet } from "~/lib/wallet-context";
 import TablerBroadcast from "~icons/tabler/broadcast";
 import { EmptyPlaceholder } from "../empty-placeholder";
@@ -15,7 +16,7 @@ import { TransactionDisplay } from "./transaction-display";
 
 const TransactionEntry: Component<{ transaction: Transaction }> = (props) => {
 	const room = useRoom();
-	const broadcastTransaction = room.makeAction(RoomEvent.TRANSACTION)[0];
+	const broadcastTransaction = sendRoomEvent(RoomEvent.TRANSACTION);
 
 	const broadcast = async () => {
 		await broadcastTransaction(encode(props.transaction));

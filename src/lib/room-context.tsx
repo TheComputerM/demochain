@@ -7,36 +7,10 @@ import {
 } from "solid-js";
 import type { Room } from "trystero";
 import { joinRoom, selfId } from "trystero/firebase";
+import { registerRoomEvents } from "./events";
 import { logger } from "./logger";
 
 const RoomContext = createContext<Room>();
-
-export enum RoomEvent {
-	/**
-	 * Send/recieve request to sync network state
-	 */
-	REQUEST_STATE = "req_state",
-
-	/**
-	 * Send/recieve network state
-	 */
-	SYNC_STATE = "syn_state",
-
-	/**
-	 * Send/recieve transactions to add to the mempool
-	 */
-	TRANSACTION = "sngl_tsx",
-
-	/**
-	 * Send/recieve mined blocks
-	 */
-	BLOCK = "sngl_blk",
-
-	/**
-	 * Send/recieve wallets when joining/leaving the network
-	 */
-	WALLET = "sngl_wlt",
-}
 
 export const TrysteroConfig = {
 	appId:
@@ -51,6 +25,7 @@ export const RoomProvider: ParentComponent = (props) => {
 	}
 
 	const room = joinRoom(TrysteroConfig, networkId);
+	registerRoomEvents(room);
 
 	logger.debug(`joined network '${networkId}' as peer:${selfId}`);
 

@@ -6,7 +6,8 @@ import { For, Portal } from "solid-js/web";
 import { Box, Stack, Wrap } from "styled-system/jsx";
 import { useBlockchain } from "~/lib/blockchain-context";
 import { Blockchain, type BlockchainState } from "~/lib/blockchain/chain";
-import { RoomEvent, useRoom } from "~/lib/room-context";
+import { RoomEvent, recieveRoomEvent, sendRoomEvent } from "~/lib/events";
+import { useRoom } from "~/lib/room-context";
 import TablerPackageImport from "~icons/tabler/package-import";
 import { Button } from "../ui/button";
 import { Dialog } from "../ui/dialog";
@@ -21,14 +22,14 @@ export const SyncDialog = () => {
 
 	const [selectedPeer, setSelectedPeer] = createSignal<string | null>();
 
-	const requestState = room.makeAction(RoomEvent.REQUEST_STATE)[0];
-	const recieveState = room.makeAction<Uint8Array>(RoomEvent.SYNC_STATE)[1];
+	const requestState = sendRoomEvent(RoomEvent.REQUEST_STATE);
+	const recieveState = recieveRoomEvent(RoomEvent.SYNC_STATE);
 
 	function startSync() {
 		if (!selectedPeer()) {
 			throw new Error("no peer is selected");
 		}
-		requestState({}, selectedPeer());
+		requestState(new Uint8Array([]), selectedPeer());
 	}
 
 	recieveState(async (data) => {
