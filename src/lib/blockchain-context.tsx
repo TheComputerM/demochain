@@ -25,7 +25,7 @@ export const BlockchainProvider: ParentComponent = (props) => {
 	const blockchain = new Blockchain({
 		blocks: [],
 		settings: {
-			difficulty: 1,
+			difficulty: 2,
 		},
 		mempool: [],
 	});
