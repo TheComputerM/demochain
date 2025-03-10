@@ -1,10 +1,4 @@
-import {
-	type SubmitHandler,
-	createForm,
-	minRange,
-	required,
-	reset,
-} from "@modular-forms/solid";
+import { createForm } from "@tanstack/solid-form";
 import { HStack } from "styled-system/jsx";
 import { hexToUint8Array } from "uint8array-extras";
 import { useBlockchain } from "~/lib/blockchain-context";
@@ -34,30 +28,30 @@ export const CreateTransaction = () => {
 		amount: 10,
 	};
 
-	const [form, { Form, Field: FormField }] = createForm<TransactionForm>({
-		initialValues,
-	});
+	const form = createForm(() => ({
+		defaultValues: {
+			nonce: blockchain.getLatestTransactionNonce(wallet.public) + 1,
+			wallet: "",
+			gas: 2,
+			amount: 10,
+		},
+		onSubmit: async ({ value }) => {
+			const recipient = hexToUint8Array(value.wallet);
+			const transaction = Transaction.create({
+				nonce: value.nonce,
+				sender: wallet.public,
+				recipient,
+				amount: value.amount,
+				gasFees: value.gas,
+			});
 
-	const handleSubmit: SubmitHandler<TransactionForm> = async (values) => {
-		const recipient = hexToUint8Array(values.wallet);
-		const transaction = Transaction.create({
-			nonce: values.nonce,
-			sender: wallet.public,
-			recipient,
-			amount: values.amount,
-			gasFees: values.gas,
-		});
+			await transaction.sign(wallet.private);
+			blockchain.addTransaction(transaction);
 
-		await transaction.sign(wallet.private);
-		blockchain.addTransaction(transaction);
-
-		reset(form, {
-			initialValues: {
-				...initialValues,
-				nonce: values.nonce + 1,
-			},
-		});
-	};
+			form.reset();
+			form.setFieldValue("nonce", value.nonce + 1);
+		},
+	}));
 
 	return (
 		<Card.Root height="min-content">
@@ -68,20 +62,35 @@ export const CreateTransaction = () => {
 					it to your mempool.
 				</Card.Description>
 			</Card.Header>
-			<Form style={{ display: "contents" }} onSubmit={handleSubmit}>
+			<form
+				style={{ display: "contents" }}
+				onSubmit={(e) => {
+					e.preventDefault();
+					e.stopPropagation();
+					form.handleSubmit();
+				}}
+			>
 				<Card.Body gap="3">
-					<FormField
+					<form.Field
 						name="nonce"
-						type="number"
-						validate={[
-							required("Nonce cannot be empty"),
-							minRange(1, "Nonce should be greater than 0"),
-						]}
+						validators={{
+							onChange: ({ value }) =>
+								value < 1 ? "Nonce should be greater than 0" : undefined,
+						}}
 					>
-						{(field, props) => (
-							<Field.Root invalid={field.error.length > 0}>
+						{(field) => (
+							<Field.Root invalid={field().state.meta.errors.length > 0}>
 								<Field.Label>Nonce</Field.Label>
-								<Field.Input {...props} type="number" value={field.value} />
+								<Field.Input
+									id={field().name}
+									name={field().name}
+									value={field().state.value}
+									onBlur={field().handleBlur}
+									onInput={(e) =>
+										field().handleChange(Number.parseInt(e.target.value))
+									}
+									type="number"
+								/>
 								<Field.HelperText>
 									Nonce is the number of transactions you have sent. Similar to
 									the{" "}
@@ -89,64 +98,113 @@ export const CreateTransaction = () => {
 										nonce in ethereum transactions.
 									</Link>
 								</Field.HelperText>
-								<Field.ErrorText>{field.error}</Field.ErrorText>
+								<Field.ErrorText>
+									{field().state.meta.errors.join(", ")}
+								</Field.ErrorText>
 							</Field.Root>
 						)}
-					</FormField>
-					<FormField
+					</form.Field>
+					<form.Field
 						name="wallet"
-						validate={required("Wallet Public Key is required")}
+						validators={{
+							onChange: ({ value }) => {
+								try {
+									const bytes = hexToUint8Array(value);
+									if (bytes.byteLength !== 32)
+										throw new Error("Invalid length of Ed25519 key");
+								} catch (error) {
+									if (error instanceof Error) {
+										return error.message;
+									}
+									return "Invalid public key";
+								}
+							},
+						}}
 					>
-						{(field, props) => (
-							<Field.Root invalid={field.error.length > 0}>
+						{(field) => (
+							<Field.Root invalid={field().state.meta.errors.length > 0}>
 								<Field.Label>Recipient public key</Field.Label>
-								<Field.Input {...props} value={field.value} />
+								<Field.Input
+									id={field().name}
+									name={field().name}
+									value={field().state.value}
+									onBlur={field().handleBlur}
+									onInput={(e) => field().handleChange(e.target.value)}
+								/>
 								<Field.HelperText>
 									Public key of the wallet you want to send crypto to.
 								</Field.HelperText>
-								<Field.ErrorText>{field.error}</Field.ErrorText>
+								<Field.ErrorText>
+									{field().state.meta.errors.join(", ")}
+								</Field.ErrorText>
 							</Field.Root>
 						)}
-					</FormField>
+					</form.Field>
 					<HStack alignItems="start">
-						<FormField
+						<form.Field
 							name="gas"
-							type="number"
-							validate={[
-								required("Gas fees cannot be empty"),
-								minRange(1, "Gas fees should be greater than 0"),
-							]}
+							validators={{
+								onChange: ({ value }) =>
+									value < 1 ? "Gas fees should be greater than 0" : undefined,
+							}}
 						>
-							{(field, props) => (
-								<Field.Root invalid={field.error.length > 0} flexGrow="1">
+							{(field) => (
+								<Field.Root
+									invalid={field().state.meta.errors.length > 0}
+									flexGrow="1"
+								>
 									<Field.Label>Gas</Field.Label>
-									<Field.Input {...props} type="number" value={field.value} />
+									<Field.Input
+										id={field().name}
+										name={field().name}
+										value={field().state.value}
+										onBlur={field().handleBlur}
+										onInput={(e) =>
+											field().handleChange(Number.parseInt(e.target.value))
+										}
+										type="number"
+									/>
 									<Field.HelperText>
 										Coins to give to the miner as an incentive.
 									</Field.HelperText>
-									<Field.ErrorText>{field.error}</Field.ErrorText>
+									<Field.ErrorText>
+										{field().state.meta.errors.join(", ")}
+									</Field.ErrorText>
 								</Field.Root>
 							)}
-						</FormField>
-						<FormField
+						</form.Field>
+						<form.Field
 							name="amount"
-							type="number"
-							validate={[
-								required("Amount cannot be empty"),
-								minRange(1, "Amount should be greater than 0"),
-							]}
+							validators={{
+								onChange: ({ value }) =>
+									value < 1 ? "Amount should be greater than 0" : undefined,
+							}}
 						>
-							{(field, props) => (
-								<Field.Root invalid={field.error.length > 0} flexGrow="1">
+							{(field) => (
+								<Field.Root
+									invalid={field().state.meta.errors.length > 0}
+									flexGrow="1"
+								>
 									<Field.Label>Amount</Field.Label>
-									<Field.Input {...props} type="number" value={field.value} />
+									<Field.Input
+										id={field().name}
+										name={field().name}
+										value={field().state.value}
+										onBlur={field().handleBlur}
+										onInput={(e) =>
+											field().handleChange(Number.parseInt(e.target.value))
+										}
+										type="number"
+									/>
 									<Field.HelperText>
 										Amount of coins to send to the recipient.
 									</Field.HelperText>
-									<Field.ErrorText>{field.error}</Field.ErrorText>
+									<Field.ErrorText>
+										{field().state.meta.errors.join(", ")}
+									</Field.ErrorText>
 								</Field.Root>
 							)}
-						</FormField>
+						</form.Field>
 					</HStack>
 				</Card.Body>
 				<Card.Footer>
@@ -155,7 +213,7 @@ export const CreateTransaction = () => {
 						<TablerTransfer />
 					</Button>
 				</Card.Footer>
-			</Form>
+			</form>
 		</Card.Root>
 	);
 };

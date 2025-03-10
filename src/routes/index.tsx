@@ -1,16 +1,8 @@
-import {
-	type SubmitHandler,
-	createForm,
-	custom,
-	maxLength,
-	minLength,
-	required,
-	setValues,
-} from "@modular-forms/solid";
 import { useNavigate } from "@solidjs/router";
-import { onMount } from "solid-js";
+import { createForm } from "@tanstack/solid-form";
 import { css } from "styled-system/css";
 import { Center, Container, Divider, HStack, Stack } from "styled-system/jsx";
+import { hexToUint8Array } from "uint8array-extras";
 import { GridPattern } from "~/components/mystic/grid-pattern";
 import ThemeSwitcher from "~/components/theme-switcher";
 import { Button } from "~/components/ui/button";
@@ -22,29 +14,28 @@ import TablerBrandGithub from "~icons/tabler/brand-github";
 function EntryForm() {
 	const navigate = useNavigate();
 
-	type SettingsForm = {
-		network: string;
-		wallet: string;
-	};
-
-	const [form, { Form, Field: FormField }] = createForm<SettingsForm>();
-
-	onMount(() => {
-		setValues(form, {
+	const form = createForm(() => ({
+		defaultValues: {
 			network: sessionStorage.getItem("network") ?? "",
 			wallet: sessionStorage.getItem("wallet") ?? "",
-		});
-	});
-
-	const handleSubmit: SubmitHandler<SettingsForm> = (values, event) => {
-		sessionStorage.setItem("network", values.network);
-		sessionStorage.setItem("wallet", values.wallet);
-		navigate("/blockchain");
-	};
+		},
+		onSubmit: async ({ value }) => {
+			sessionStorage.setItem("network", value.network);
+			sessionStorage.setItem("wallet", value.wallet);
+			navigate("/blockchain");
+		},
+	}));
 
 	return (
 		<Container maxWidth="md" width="full" zIndex={5}>
-			<Form style={{ display: "contents" }} onSubmit={handleSubmit}>
+			<form
+				style={{ display: "contents" }}
+				onSubmit={(e) => {
+					e.preventDefault();
+					e.stopPropagation();
+					form.handleSubmit();
+				}}
+			>
 				<Stack
 					gap="3"
 					backgroundColor="bg.default"
@@ -52,53 +43,81 @@ function EntryForm() {
 					borderRadius="l2"
 					p="4"
 				>
-					<FormField
+					<form.Field
 						name="network"
-						validate={[
-							required("Network ID is required"),
-							minLength(4, "Network ID should be at least 4 characters"),
-							maxLength(12, "Network ID should be at most 12 characters"),
-							custom(
-								(value) =>
-									!value?.includes(" ") && value === value?.toLowerCase(),
-								"Network ID should be snake_case",
-							),
-						]}
+						validators={{
+							onChange: ({ value }) =>
+								value.length < 4
+									? "Network code must be at least 4 characters long"
+									: value.length > 12
+										? "Network code must be at most 12 characters long"
+										: undefined,
+						}}
 					>
-						{(field, props) => (
-							<Field.Root invalid={field.error.length > 0}>
-								<Field.Label>Network Code*</Field.Label>
+						{(field) => (
+							<Field.Root invalid={field().state.meta.errors.length > 0}>
+								<Field.Label for={field().name}>Network Code*</Field.Label>
 								<Field.Input
-									{...props}
-									value={field.value}
+									id={field().name}
+									name={field().name}
+									onBlur={field().handleBlur}
+									value={field().state.value}
 									type="text"
 									placeholder="random_code"
+									onInput={(e) => field().handleChange(e.target.value)}
 								/>
 								<Field.HelperText>
 									Share and use it to connect to the same network
 								</Field.HelperText>
-								<Field.ErrorText>{field.error}</Field.ErrorText>
+								<Field.ErrorText>
+									{field().state.meta.errors.join(", ")}
+								</Field.ErrorText>
 							</Field.Root>
 						)}
-					</FormField>
-					<FormField name="wallet">
-						{(field, props) => (
-							<Field.Root invalid={field.error.length > 0}>
-								<Field.Label>Private key</Field.Label>
-								<Field.Input {...props} value={field.value} type="text" />
+					</form.Field>
+					<form.Field
+						name="wallet"
+						validators={{
+							onChange: ({ value }) => {
+								try {
+									const bytes = hexToUint8Array(value);
+									if (bytes.byteLength !== 32 && bytes.byteLength !== 0)
+										throw new Error("Invalid length of Ed25519 private key");
+								} catch (error) {
+									if (error instanceof Error) {
+										return error.message;
+									}
+									return "Invalid private key";
+								}
+							},
+						}}
+					>
+						{(field) => (
+							<Field.Root invalid={field().state.meta.errors.length > 0}>
+								<Field.Label for={field().name}>Private key</Field.Label>
+								<Field.Input
+									id={field().name}
+									name={field().name}
+									value={field().state.value}
+									onBlur={field().handleBlur}
+									onInput={(e) => field().handleChange(e.target.value)}
+									type="text"
+								/>
 								<Field.HelperText>
 									Leave empty if you want to generate a random wallet
 								</Field.HelperText>
-								<Field.ErrorText>{field.error}</Field.ErrorText>
+								<Field.ErrorText>
+									{field().state.meta.errors.join(", ")}
+								</Field.ErrorText>
 							</Field.Root>
 						)}
-					</FormField>
+					</form.Field>
 					<Divider />
 					<Button size="2xl" type="submit">
 						Enter the App
 					</Button>
 				</Stack>
-			</Form>
+			</form>
 		</Container>
 	);
 }
