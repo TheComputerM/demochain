@@ -6,6 +6,7 @@ import { PeerDisplay } from "~/components/chain/peer-display";
 import { EmptyPlaceholder } from "~/components/empty-placeholder";
 import { Card } from "~/components/ui/card";
 import { Heading } from "~/components/ui/heading";
+import { NumberInput } from "~/components/ui/number-input";
 import { Table } from "~/components/ui/table";
 import { useBlockchain } from "~/lib/blockchain-context";
 
@@ -26,7 +27,9 @@ function NetworkSettings() {
 				</Table.Row>
 				<Table.Row>
 					<Table.Header>Difficulty</Table.Header>
-					<Table.Cell>{blockchain.store.settings.difficulty}</Table.Cell>
+					<Table.Cell>
+						<DifficultyAdjuster />
+					</Table.Cell>
 				</Table.Row>
 				<Table.Row>
 					<Table.Header>Connected peers</Table.Header>
@@ -34,6 +37,20 @@ function NetworkSettings() {
 				</Table.Row>
 			</Table.Body>
 		</Table.Root>
+	);
+}
+
+function DifficultyAdjuster() {
+	const blockchain = useBlockchain();
+
+	return (
+		<NumberInput
+			value={blockchain.store.settings.difficulty.toString()}
+			min={1}
+			onValueChange={({ valueAsNumber }) =>
+				blockchain.setStore("settings", "difficulty", valueAsNumber)
+			}
+		/>
 	);
 }
 
